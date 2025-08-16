@@ -23,23 +23,52 @@ export class FirebaseServerAdapter extends BaseAdapter {
       if (admin.apps.length > 0) {
         this.app = admin.apps[0];
       } else {
-        // Initialize with provided config or default
-        const appConfig = this.config || {
-          credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-          }),
-        };
+        // Check if we have the required environment variables
+        const hasFirebaseConfig =
+          process.env.FIREBASE_PROJECT_ID &&
+          process.env.FIREBASE_CLIENT_EMAIL &&
+          process.env.FIREBASE_PRIVATE_KEY;
 
-        this.app = admin.initializeApp(appConfig);
+        if (hasFirebaseConfig) {
+          // Initialize with provided config or default
+          const appConfig = this.config || {
+            credential: admin.credential.cert({
+              projectId: process.env.FIREBASE_PROJECT_ID,
+              clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+              privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(
+                /\\n/g,
+                '\n'
+              ),
+            }),
+          };
+
+          this.app = admin.initializeApp(appConfig);
+        } else {
+          // Use Firebase emulator for development
+          console.warn(
+            'Firebase environment variables not found. Using Firebase emulator for development.'
+          );
+
+          const appConfig = this.config || {
+            projectId: 'demo-project',
+          };
+
+          this.app = admin.initializeApp(appConfig);
+
+          // Connect to emulator
+          process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
+        }
       }
 
       this.db = admin.firestore();
       this.connected = true;
     } catch (error) {
       console.error('Failed to connect to Firebase:', error);
-      throw new Error('Firebase connection failed');
+      throw new Error(
+        `Firebase connection failed: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
+      );
     }
   }
 
