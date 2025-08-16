@@ -1,15 +1,5 @@
-import * as admin from 'firebase-admin';
 import { NextResponse } from 'next/server';
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-    }),
-  });
-}
-
-const db = admin.firestore();
+import { DatabaseFactory, CreateCreatureDTO } from '@/lib/database';
 
 export async function POST(request: Request) {
   try {
@@ -24,20 +14,41 @@ export async function POST(request: Request) {
       );
     }
 
-    const creature = {
+    const creatureRepo = await DatabaseFactory.getCreatureRepository('server');
+    const creatureData: CreateCreatureDTO = {
       name: body.name,
       ownerId: body.ownerId,
-      createdAt: admin.firestore.Timestamp.now(),
-      hunger: 100,
-      love: 100,
-      tiredness: 0,
+      type: body.type || 'default',
+      hunger: body.hunger,
+      love: body.love,
+      tiredness: body.tiredness,
     };
 
-    const docRef = await db.collection('creatures').add(creature);
+    const creature = await creatureRepo.create(creatureData);
 
-    return NextResponse.json({ creatureId: docRef.id }, { status: 201 });
+    return NextResponse.json(
+      {
+        creatureId: creature.id,
+        creature: creature,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error creating creature:', error);
+
+    if (
+      error instanceof Error &&
+      error.message?.includes('already has a creature')
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'User already has a creature. Each user can only have one creature.',
+        },
+        { status: 409 } // Conflict
+      );
+    }
+
     return NextResponse.json(
       { error: 'Failed to create creature' },
       { status: 500 }
