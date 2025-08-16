@@ -4,10 +4,7 @@
  */
 
 import { DatabaseAdapter } from './adapters/base.adapter';
-import {
-  FirebaseServerAdapter,
-  FirebaseClientAdapter,
-} from './adapters/firebase';
+import { FirebaseClientAdapter } from './adapters/firebase/client.adapter';
 import { CreatureRepository } from './repositories';
 import { DatabaseConfig } from './types';
 
@@ -50,10 +47,20 @@ export class DatabaseFactory {
 
     switch (dbType) {
       case 'firebase':
-        adapter =
-          env === 'server'
-            ? new FirebaseServerAdapter(this.config?.options)
-            : new FirebaseClientAdapter(this.config?.options);
+        if (env === 'server') {
+          // Only import server adapter on server side
+          if (typeof window !== 'undefined') {
+            throw new Error('Server adapter cannot be used on client side');
+          }
+
+          // Dynamically import server adapter to avoid bundling on client
+          const { FirebaseServerAdapter } = await import(
+            './adapters/firebase/server.adapter'
+          );
+          adapter = new FirebaseServerAdapter(this.config?.options);
+        } else {
+          adapter = new FirebaseClientAdapter(this.config?.options);
+        }
         break;
 
       // Future database types can be added here

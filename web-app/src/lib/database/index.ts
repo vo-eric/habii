@@ -1,20 +1,13 @@
 /**
  * Database Abstraction Layer
  * Main exports for the database module
+ *
+ * For client-side usage, import from '@/lib/database/client'
+ * For server-side usage, import from '@/lib/database/server'
  */
 
 // Types
 export * from './types';
 
-// Adapters
-export { DatabaseAdapter, BaseAdapter } from './adapters/base.adapter';
-export {
-  FirebaseServerAdapter,
-  FirebaseClientAdapter,
-} from './adapters/firebase';
-
-// Repositories
-export { CreatureRepository } from './repositories';
-
-// Factory
+// Factory (will use appropriate adapter based on environment)
 export { DatabaseFactory, databaseFactory } from './factory';

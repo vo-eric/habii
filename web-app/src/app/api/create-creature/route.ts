@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
-import { DatabaseFactory, CreateCreatureDTO } from '@/lib/database';
+import {
+  ServerDatabaseFactory,
+  CreateCreatureDTO,
+} from '@/lib/database/server';
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +17,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const creatureRepo = await DatabaseFactory.getCreatureRepository('server');
+    const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
     const creatureData: CreateCreatureDTO = {
       name: body.name,
       ownerId: body.ownerId,

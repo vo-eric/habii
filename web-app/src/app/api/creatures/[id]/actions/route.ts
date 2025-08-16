@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { DatabaseFactory } from '@/lib/database';
+import { ServerDatabaseFactory } from '@/lib/database/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: Request,
@@ -16,7 +16,7 @@ export async function POST(
       );
     }
 
-    const creatureRepo = await DatabaseFactory.getCreatureRepository('server');
+    const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
     let creature;
 
     switch (action) {

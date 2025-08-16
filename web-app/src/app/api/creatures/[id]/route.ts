@@ -1,12 +1,15 @@
-import { NextResponse } from 'next/server';
-import { DatabaseFactory, UpdateCreatureDTO } from '@/lib/database';
+import {
+  ServerDatabaseFactory,
+  UpdateCreatureDTO,
+} from '@/lib/database/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const creatureRepo = await DatabaseFactory.getCreatureRepository('server');
+    const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
     const creature = await creatureRepo.getById(params.id);
 
     if (!creature) {
@@ -32,7 +35,7 @@ export async function PATCH(
 ) {
   try {
     const body = await request.json();
-    const creatureRepo = await DatabaseFactory.getCreatureRepository('server');
+    const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
 
     const updateData: UpdateCreatureDTO = {};
 
@@ -73,7 +76,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const creatureRepo = await DatabaseFactory.getCreatureRepository('server');
+    const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
     await creatureRepo.delete(params.id);
 
     return NextResponse.json(

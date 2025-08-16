@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { DatabaseFactory, Creature, UpdateCreatureDTO } from '@/lib/database';
+import {
+  ClientDatabaseFactory,
+  Creature,
+  UpdateCreatureDTO,
+} from '@/lib/database/client';
 
 export interface UseCreatureOptions {
   autoRefresh?: boolean;
@@ -18,7 +22,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
       setLoading(true);
       setError(null);
 
-      const repo = await DatabaseFactory.getCreatureRepository('client');
+      const repo = await ClientDatabaseFactory.getCreatureRepository();
       const userCreature = await repo.getByOwnerId(ownerId);
 
       setCreature(userCreature);
@@ -37,7 +41,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
         setLoading(true);
         setError(null);
 
-        const repo = await DatabaseFactory.getCreatureRepository('client');
+        const repo = await ClientDatabaseFactory.getCreatureRepository();
         const newCreature = await repo.create({
           name,
           ownerId,
@@ -71,7 +75,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
         setLoading(true);
         setError(null);
 
-        const repo = await DatabaseFactory.getCreatureRepository('client');
+        const repo = await ClientDatabaseFactory.getCreatureRepository();
         const updatedCreature = await repo.update(creature.id, updates);
 
         if (updatedCreature) {
@@ -102,7 +106,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
       try {
         setError(null);
 
-        const repo = await DatabaseFactory.getCreatureRepository('client');
+        const repo = await ClientDatabaseFactory.getCreatureRepository();
         const updatedCreature = await repo.feed(creature.id, amount);
 
         if (updatedCreature) {
@@ -129,7 +133,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
     try {
       setError(null);
 
-      const repo = await DatabaseFactory.getCreatureRepository('client');
+      const repo = await ClientDatabaseFactory.getCreatureRepository();
       const updatedCreature = await repo.play(creature.id);
 
       if (updatedCreature) {
@@ -155,7 +159,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
       try {
         setError(null);
 
-        const repo = await DatabaseFactory.getCreatureRepository('client');
+        const repo = await ClientDatabaseFactory.getCreatureRepository();
         const updatedCreature = await repo.rest(creature.id, duration);
 
         if (updatedCreature) {
@@ -180,7 +184,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
     }
 
     try {
-      const repo = await DatabaseFactory.getCreatureRepository('client');
+      const repo = await ClientDatabaseFactory.getCreatureRepository();
       return await repo.needsAttention(creature.id);
     } catch (err) {
       console.error('Error checking attention:', err);
@@ -199,7 +203,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
       setLoading(true);
       setError(null);
 
-      const repo = await DatabaseFactory.getCreatureRepository('client');
+      const repo = await ClientDatabaseFactory.getCreatureRepository();
       await repo.delete(creature.id);
 
       setCreature(null);

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { DatabaseFactory } from '@/lib/database';
+import { ServerDatabaseFactory } from '@/lib/database/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Get all creatures for a user (currently returns only one)
@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { userId: string } }
 ) {
   try {
-    const creatureRepo = await DatabaseFactory.getCreatureRepository('server');
+    const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
     const creature = await creatureRepo.getByOwnerId(params.userId);
 
     if (!creature) {
@@ -39,7 +39,7 @@ export async function DELETE(
   { params }: { params: { userId: string } }
 ) {
   try {
-    const creatureRepo = await DatabaseFactory.getCreatureRepository('server');
+    const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
     await creatureRepo.deleteByOwnerId(params.userId);
 
     return NextResponse.json(
