@@ -6,24 +6,32 @@ import {
   Creature,
   UpdateCreatureDTO,
 } from '@/lib/database/client';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 export interface UseCreatureOptions {
   autoRefresh?: boolean;
   refreshInterval?: number; // milliseconds
 }
 
-export function useCreature(ownerId: string, options?: UseCreatureOptions) {
+export function useCreature(options?: UseCreatureOptions) {
+  const { user } = useAuth();
   const [creature, setCreature] = useState<Creature | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadCreature = useCallback(async () => {
+    if (!user?.uid) {
+      setCreature(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
 
       const repo = await ClientDatabaseFactory.getCreatureRepository();
-      const userCreature = await repo.getByOwnerId(ownerId);
+      const userCreature = await repo.getByOwnerId(user.uid);
 
       setCreature(userCreature);
     } catch (err) {
@@ -32,11 +40,15 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
     } finally {
       setLoading(false);
     }
-  }, [ownerId]);
+  }, [user?.uid]);
 
   // Create a new creature
   const createCreature = useCallback(
     async (name: string, type?: string) => {
+      if (!user?.uid) {
+        throw new Error('User not authenticated');
+      }
+
       try {
         setLoading(true);
         setError(null);
@@ -44,7 +56,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
         const repo = await ClientDatabaseFactory.getCreatureRepository();
         const newCreature = await repo.create({
           name,
-          ownerId,
+          ownerId: user.uid,
           type,
         });
 
@@ -60,7 +72,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
         setLoading(false);
       }
     },
-    [ownerId]
+    [user?.uid]
   );
 
   // Update creature
@@ -253,7 +265,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
 /**
  * Example usage in a component:
  *
- * function CreatureCard({ userId }: { userId: string }) {
+ * function CreatureCard() {
  *   const {
  *     creature,
  *     loading,
@@ -261,7 +273,7 @@ export function useCreature(ownerId: string, options?: UseCreatureOptions) {
  *     feedCreature,
  *     playWithCreature,
  *     restCreature
- *   } = useCreature(userId, { autoRefresh: true, refreshInterval: 30000 });
+ *   } = useCreature({ autoRefresh: true, refreshInterval: 30000 });
  *
  *   if (loading) return <div>Loading...</div>;
  *   if (error) return <div>Error: {error}</div>;
