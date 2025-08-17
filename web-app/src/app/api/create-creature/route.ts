@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server';
-import {
-  ServerDatabaseFactory,
-  CreateCreatureDTO,
-} from '@/lib/database/server';
+import { ServerDatabaseFactory } from '@/lib/database/server-factory';
+import { CreateCreatureDTO } from '@/lib/database/types';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+
+    // Validate required fields
+    if (!body.name) {
+      return NextResponse.json(
+        {
+          error: 'Name is required',
+        },
+        { status: 400 }
+      );
+    }
 
     if (!body.ownerId) {
       return NextResponse.json(

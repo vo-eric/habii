@@ -6,6 +6,9 @@
 import * as admin from 'firebase-admin';
 import { BaseAdapter } from '../base.adapter';
 import { QueryOptions, PaginatedResult, Timestamp } from '../../types';
+import serviceAccountKey from '~/serviceAccountKey.json' assert { type: 'json' };
+
+const serviceAccount = serviceAccountKey as admin.ServiceAccount;
 
 export class FirebaseServerAdapter extends BaseAdapter {
   private db: admin.firestore.Firestore | null = null;
@@ -23,15 +26,26 @@ export class FirebaseServerAdapter extends BaseAdapter {
       if (admin.apps.length > 0) {
         this.app = admin.apps[0];
       } else {
-        // Initialize with provided config or default
-        const appConfig = this.config || {
-          credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-          }),
-        };
+        // Use provided config, service account, or fall back to emulator
+        let appConfig = this.config;
 
+        if (!appConfig) {
+          if (serviceAccount) {
+            appConfig = {
+              credential: admin.credential.cert(serviceAccount),
+            };
+            console.log('Using service account file for authentication');
+          } else {
+            // Fall back to emulator
+            appConfig = {
+              projectId: process.env.FIREBASE_PROJECT_ID || 'demo-project',
+            };
+            console.log('Using Firebase emulator for development');
+            process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
+          }
+        }
+
+        console.log('server appConfig', appConfig);
         this.app = admin.initializeApp(appConfig);
       }
 
@@ -39,7 +53,11 @@ export class FirebaseServerAdapter extends BaseAdapter {
       this.connected = true;
     } catch (error) {
       console.error('Failed to connect to Firebase:', error);
-      throw new Error('Firebase connection failed');
+      throw new Error(
+        `Firebase connection failed: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
+      );
     }
   }
 
