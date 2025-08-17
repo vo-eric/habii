@@ -6,8 +6,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    console.log('body', body);
-
     // Validate required fields
     if (!body.name) {
       return NextResponse.json(

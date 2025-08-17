@@ -3,11 +3,14 @@
  * Exports only client-side database components to prevent server-side code from being bundled
  */
 
+import { ClientDatabaseFactory } from './client-factory';
+
 // Types
 export * from './types';
 
 // Client Adapters
-export { DatabaseAdapter, BaseAdapter } from './adapters/base.adapter';
+export { BaseAdapter } from './adapters/base.adapter';
+export type { DatabaseAdapter } from './adapters/base.adapter';
 export { FirebaseClientAdapter } from './adapters/firebase/client.adapter';
 
 // Repositories
@@ -18,4 +21,3 @@ export { ClientDatabaseFactory, clientDatabaseFactory } from './client-factory';
 
 // Alias for backward compatibility
 export const DatabaseFactory = ClientDatabaseFactory;
-export const databaseFactory = clientDatabaseFactory;
