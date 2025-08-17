@@ -31,6 +31,7 @@ export const SignupForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { signUp } = useAuth();
   const router = useRouter();
   const toast = useToast();
@@ -39,14 +40,18 @@ export const SignupForm: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    trigger,
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
+    mode: 'onChange', // Enable real-time validation
   });
 
   const onSubmit = async (data: SignupFormData) => {
     if (isLoading) return;
 
     setIsLoading(true);
+    setSubmitError(null); // Clear any previous errors
+
     try {
       await signUp(data.email, data.password, data.displayName);
       toast({
@@ -76,6 +81,10 @@ export const SignupForm: React.FC = () => {
         }
       }
 
+      // Set the error state to display in the UI
+      setSubmitError(errorMessage);
+
+      // Also show toast for immediate feedback
       toast({
         title: 'Sign Up Failed',
         description: errorMessage,
@@ -97,7 +106,9 @@ export const SignupForm: React.FC = () => {
             <Input
               type='text'
               placeholder='Enter your display name'
-              {...register('displayName')}
+              {...register('displayName', {
+                onChange: () => trigger('displayName'),
+              })}
             />
             <FormErrorMessage>{errors.displayName?.message}</FormErrorMessage>
           </FormControl>
@@ -107,7 +118,9 @@ export const SignupForm: React.FC = () => {
             <Input
               type='email'
               placeholder='Enter your email'
-              {...register('email')}
+              {...register('email', {
+                onChange: () => trigger('email'),
+              })}
             />
             <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
           </FormControl>
@@ -118,7 +131,12 @@ export const SignupForm: React.FC = () => {
               <Input
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Enter your password'
-                {...register('password')}
+                {...register('password', {
+                  onChange: () => {
+                    trigger('password');
+                    trigger('confirmPassword'); // Also validate confirm password when password changes
+                  },
+                })}
               />
               <InputRightElement>
                 <IconButton
@@ -139,7 +157,9 @@ export const SignupForm: React.FC = () => {
               <Input
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder='Confirm your password'
-                {...register('confirmPassword')}
+                {...register('confirmPassword', {
+                  onChange: () => trigger('confirmPassword'),
+                })}
               />
               <InputRightElement>
                 <IconButton
@@ -157,6 +177,13 @@ export const SignupForm: React.FC = () => {
               {errors.confirmPassword?.message}
             </FormErrorMessage>
           </FormControl>
+
+          {/* Submit Error Display */}
+          {submitError && (
+            <Text color='red.500' fontSize='sm' textAlign='center' mt={1}>
+              {submitError}
+            </Text>
+          )}
 
           <Button
             type='submit'
