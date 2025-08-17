@@ -30,7 +30,6 @@ export class CreatureRepository {
     };
 
     const id = await this.adapter.create(this.COLLECTION_NAME, creatureData);
-
     return this.getById(id) as Promise<Creature>;
   }
 

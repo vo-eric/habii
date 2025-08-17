@@ -20,7 +20,7 @@ export default function CreatureDisplay() {
         },
         body: JSON.stringify({
           name: 'Test Creature',
-          ownerId: 'test-user-id1',
+          ownerId: 'test-user-id',
           type: 'default',
           hunger: 100,
           love: 100,

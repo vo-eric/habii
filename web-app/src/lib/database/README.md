@@ -182,7 +182,7 @@ switch (dbType) {
 
 ```env
 # Change from Firebase to PostgreSQL
-NEXT_PUBLIC_DATABASE_TYPE=postgres
+DATABASE_TYPE=postgres
 DATABASE_URL=postgresql://user:password@localhost:5432/habii
 ```
 
@@ -199,15 +199,15 @@ FIREBASE_CLIENT_EMAIL=your-client-email
 FIREBASE_PRIVATE_KEY=your-private-key
 
 # Client-side (Firebase SDK)
-NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-storage-bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+FIREBASE_API_KEY=your-api-key
+FIREBASE_AUTH_DOMAIN=your-auth-domain
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_STORAGE_BUCKET=your-storage-bucket
+FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+FIREBASE_APP_ID=your-app-id
 
 # Database Type
-NEXT_PUBLIC_DATABASE_TYPE=firebase  # or 'postgres', 'mongodb', etc.
+DATABASE_TYPE=firebase  # or 'postgres', 'mongodb', etc.
 ```
 
 ## Testing
