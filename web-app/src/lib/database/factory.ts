@@ -5,7 +5,7 @@
 
 import { DatabaseAdapter } from './adapters/base.adapter';
 import { FirebaseClientAdapter } from './adapters/firebase/client.adapter';
-import { CreatureRepository } from './repositories';
+import { CreatureRepository, UserRepository } from './repositories';
 import { DatabaseConfig } from './types';
 
 export class DatabaseFactory {
@@ -101,6 +101,16 @@ export class DatabaseFactory {
   ): Promise<CreatureRepository> {
     const adapter = await this.getAdapter(environment);
     return new CreatureRepository(adapter);
+  }
+
+  /**
+   * Get a user repository instance
+   */
+  static async getUserRepository(
+    environment?: 'client' | 'server'
+  ): Promise<UserRepository> {
+    const adapter = await this.getAdapter(environment);
+    return new UserRepository(adapter);
   }
 
   /**
