@@ -23,9 +23,11 @@ import {
   Timestamp as FirestoreTimestamp,
   serverTimestamp,
   getCountFromServer,
+  onSnapshot,
   DocumentData,
   QueryConstraint,
   Transaction,
+  Unsubscribe,
 } from 'firebase/firestore';
 import { BaseAdapter } from '../base.adapter';
 import { QueryOptions, PaginatedResult, Timestamp } from '../../types';
@@ -336,7 +338,7 @@ export class FirebaseClientAdapter extends BaseAdapter {
     return !snapshot.empty;
   }
 
-  async createCollection(collectionName: string): Promise<void> {
+  async createCollection(_collectionName: string): Promise<void> {
     // Firestore creates collections automatically when documents are added
     // This is a no-op for Firestore
   }
@@ -381,6 +383,113 @@ export class FirebaseClientAdapter extends BaseAdapter {
     });
 
     return converted;
+  }
+
+  /**
+   * Listen to real-time changes for a document
+   * @param collectionName - Name of the collection
+   * @param id - Document ID
+   * @param callback - Function called when document changes
+   * @returns Unsubscribe function
+   */
+  listenToDocument<T>(
+    collectionName: string,
+    id: string,
+    callback: (data: T | null) => void,
+    onError?: (error: Error) => void
+  ): Unsubscribe {
+    this.ensureConnected();
+
+    const docRef = doc(this.db!, collectionName, id);
+
+    return onSnapshot(
+      docRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data() as DocumentData;
+          const convertedData = this.convertFirestoreData(data) as Record<
+            string,
+            unknown
+          >;
+          callback({
+            id: docSnap.id,
+            ...convertedData,
+          } as T);
+        } else {
+          callback(null);
+        }
+      },
+      (error) => {
+        console.error('Error listening to document:', error);
+        if (onError) {
+          onError(new Error(`Failed to listen to document: ${error.message}`));
+        }
+      }
+    );
+  }
+
+  /**
+   * Listen to real-time changes for a collection query
+   * @param collectionName - Name of the collection
+   * @param constraintSpecs - Query constraint specifications
+   * @param callback - Function called when query results change
+   * @returns Unsubscribe function
+   */
+  listenToCollection<T>(
+    collectionName: string,
+    constraintSpecs: Array<{ field: string; operator: string; value: unknown }>,
+    callback: (data: T[]) => void,
+    onError?: (error: Error) => void
+  ): Unsubscribe {
+    this.ensureConnected();
+
+    // Convert constraint specs to Firestore QueryConstraints
+    const constraints: QueryConstraint[] = constraintSpecs.map((spec) => {
+      return where(
+        spec.field,
+        spec.operator as
+          | '=='
+          | '!='
+          | '<'
+          | '<='
+          | '>'
+          | '>='
+          | 'array-contains'
+          | 'array-contains-any'
+          | 'in'
+          | 'not-in',
+        spec.value
+      );
+    });
+
+    const q = query(collection(this.db!, collectionName), ...constraints);
+
+    return onSnapshot(
+      q,
+      (querySnap) => {
+        const results: T[] = [];
+        querySnap.forEach((doc) => {
+          const data = doc.data() as DocumentData;
+          const convertedData = this.convertFirestoreData(data) as Record<
+            string,
+            unknown
+          >;
+          results.push({
+            id: doc.id,
+            ...convertedData,
+          } as T);
+        });
+        callback(results);
+      },
+      (error) => {
+        console.error('Error listening to collection:', error);
+        if (onError) {
+          onError(
+            new Error(`Failed to listen to collection: ${error.message}`)
+          );
+        }
+      }
+    );
   }
 }
 

@@ -230,12 +230,58 @@ export function useCreature(options?: UseCreatureOptions) {
     }
   }, [creature]);
 
-  // Initial load
+  // Real-time listener effect
   useEffect(() => {
-    loadCreature();
-  }, [loadCreature]);
+    let unsubscribe: (() => void) | null = null;
 
-  // Auto-refresh
+    const setupRealTimeListener = async () => {
+      if (!user?.uid) return;
+
+      try {
+        const repo = await ClientDatabaseFactory.getCreatureRepository();
+
+        // Try to set up real-time listener
+        unsubscribe = repo.listenToCreatureByOwnerId(
+          user.uid,
+          (updatedCreature) => {
+            setCreature(updatedCreature);
+            setLoading(false);
+          },
+          (error) => {
+            console.error('Real-time listener error:', error);
+            setError(error.message);
+            // Fallback to manual loading if real-time fails
+            loadCreature();
+          }
+        );
+
+        // If real-time listeners aren't supported, fall back to manual loading
+        if (!unsubscribe) {
+          console.log(
+            'Real-time listeners not supported, using manual loading'
+          );
+          loadCreature();
+        } else {
+          console.log('Real-time listener established for creature updates');
+        }
+      } catch (err) {
+        console.error('Error setting up real-time listener:', err);
+        // Fallback to manual loading
+        loadCreature();
+      }
+    };
+
+    setupRealTimeListener();
+
+    // Cleanup function
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [user?.uid, loadCreature]);
+
+  // Auto-refresh fallback (only if real-time listeners aren't working)
   useEffect(() => {
     if (options?.autoRefresh && options?.refreshInterval) {
       const interval = setInterval(loadCreature, options.refreshInterval);

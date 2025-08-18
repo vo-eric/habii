@@ -60,6 +60,21 @@ export interface DatabaseAdapter {
   collectionExists(collection: string): Promise<boolean>;
   createCollection(collection: string): Promise<void>;
   dropCollection(collection: string): Promise<void>;
+
+  // Real-time listeners (optional - only supported by some adapters)
+  listenToDocument?<T>(
+    collection: string,
+    id: string,
+    callback: (data: T | null) => void,
+    onError?: (error: Error) => void
+  ): () => void; // Returns unsubscribe function
+
+  listenToCollection?<T>(
+    collection: string,
+    constraints: unknown[], // Query constraints (adapter-specific)
+    callback: (data: T[]) => void,
+    onError?: (error: Error) => void
+  ): () => void; // Returns unsubscribe function
 }
 
 export abstract class BaseAdapter implements DatabaseAdapter {
