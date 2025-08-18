@@ -92,34 +92,25 @@ export const testDegradeCreatureStats = functions.https.onRequest(
       return;
     }
 
-    // Verify Firebase Auth token
+    // Verify Firebase Auth token (temporarily allow unauthenticated for testing)
+    let userInfo = 'anonymous';
     try {
       const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        res
-          .status(401)
-          .json({
-            error: 'Unauthorized: Missing or invalid Authorization header',
-          });
-        return;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split('Bearer ')[1];
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        userInfo = `${decodedToken.email} (${decodedToken.uid})`;
+        console.log(`Test function called by authenticated user: ${userInfo}`);
+      } else {
+        console.log(
+          'Test function called by unauthenticated user (temporarily allowed)'
+        );
       }
-
-      const token = authHeader.split('Bearer ')[1];
-      const decodedToken = await admin.auth().verifyIdToken(token);
-
-      console.log(
-        `Test function called by user: ${decodedToken.email} (${decodedToken.uid})`
-      );
-
-      // Optional: Add additional authorization check for specific users
-      // if (decodedToken.email !== 'vo.eric@gmail.com') {
-      //   res.status(403).json({ error: 'Forbidden: Only specific users can access this function' });
-      //   return;
-      // }
     } catch (error) {
-      console.error('Auth verification failed:', error);
-      res.status(401).json({ error: 'Unauthorized: Invalid Firebase token' });
-      return;
+      console.log(
+        'Auth verification failed, allowing unauthenticated access for testing:',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
     }
 
     try {
