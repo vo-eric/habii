@@ -3,13 +3,22 @@
 import { useCreature } from '@/lib/database/hooks/useCreature';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useState } from 'react';
+import CreatureActions from './CreatureActions';
 
 export default function CreatureDisplay() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const { creature, createCreature } = useCreature();
+  const {
+    creature,
+    createCreature,
+    reload,
+    feedCreature,
+    playWithCreature,
+    restCreature,
+    loading: creatureLoading,
+  } = useCreature();
 
   const handleCreateCreature = async () => {
     if (!user?.uid) {
@@ -67,7 +76,16 @@ export default function CreatureDisplay() {
         >
           {loading ? 'Creating...' : 'Create Creature'}
         </button>
-      ) : null}
+      ) : (
+        <div className='space-y-4'>
+          <CreatureActions
+            feedCreature={feedCreature}
+            playWithCreature={playWithCreature}
+            restCreature={restCreature}
+            loading={creatureLoading}
+          />
+        </div>
+      )}
     </div>
   );
 }
