@@ -5,12 +5,13 @@ import {
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
-    const creature = await creatureRepo.getById(params.id);
+    const creature = await creatureRepo.getById(id);
 
     if (!creature) {
       return NextResponse.json(
@@ -30,10 +31,11 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
 
@@ -44,7 +46,7 @@ export async function PATCH(
     if (body.love !== undefined) updateData.love = body.love;
     if (body.tiredness !== undefined) updateData.tiredness = body.tiredness;
 
-    const creature = await creatureRepo.update(params.id, updateData);
+    const creature = await creatureRepo.update(id, updateData);
 
     if (!creature) {
       return NextResponse.json(
@@ -72,12 +74,13 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
-    await creatureRepo.delete(params.id);
+    await creatureRepo.delete(id);
 
     return NextResponse.json(
       { message: 'Creature deleted successfully' },

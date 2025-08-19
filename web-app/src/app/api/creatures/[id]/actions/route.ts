@@ -2,10 +2,11 @@ import { ServerDatabaseFactory } from '@/lib/database/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { action, ...actionParams } = body;
 
@@ -21,18 +22,18 @@ export async function POST(
 
     switch (action) {
       case 'feed':
-        creature = await creatureRepo.feed(params.id, actionParams.amount);
+        creature = await creatureRepo.feed(id, actionParams.amount);
         break;
       case 'play':
-        creature = await creatureRepo.play(params.id);
+        creature = await creatureRepo.play(id);
         break;
       case 'rest':
-        creature = await creatureRepo.rest(params.id, actionParams.duration);
+        creature = await creatureRepo.rest(id, actionParams.duration);
         break;
       case 'check_attention':
-        const attentionStatus = await creatureRepo.needsAttention(params.id);
+        const attentionStatus = await creatureRepo.needsAttention(id);
         return NextResponse.json({
-          creature: await creatureRepo.getById(params.id),
+          creature: await creatureRepo.getById(id),
           ...attentionStatus,
         });
 
