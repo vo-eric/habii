@@ -1,0 +1,20 @@
+{
+  "name": "habii-root",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "web:dev": "cd web-app && bun run dev",
+    "web:build": "cd web-app && bun run build",
+    "web:start": "cd web-app && bun run start",
+    "functions:dev": "cd web-app && firebase emulators:start --only functions",
+    "functions:deploy": "cd web-app && firebase deploy --only functions",
+    "functions:build": "cd functions && bun run build",
+    "functions:install": "cd functions && bun install",
+    "install:all": "cd web-app && bun install && cd ../functions && bun install"
+  },
+  "workspaces": [
+    "web-app",
+    "functions",
+    "pi-app"
+  ]
+}

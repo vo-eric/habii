@@ -228,4 +228,74 @@ export class CreatureRepository {
 
     return createdCreatures;
   }
+
+  /**
+   * Listen to real-time changes for a creature by owner ID
+   * @param ownerId - The owner's user ID
+   * @param callback - Function called when creature data changes
+   * @param onError - Function called on errors
+   * @returns Unsubscribe function (call to stop listening)
+   */
+  listenToCreatureByOwnerId(
+    ownerId: string,
+    callback: (creature: Creature | null) => void,
+    onError?: (error: Error) => void
+  ): (() => void) | null {
+    // Check if the adapter supports real-time listeners
+    if (!this.adapter.listenToDocument) {
+      console.warn(
+        'Real-time listeners not supported by current database adapter'
+      );
+      return null;
+    }
+
+    // For now, we'll use a collection listener since we need to query by ownerId
+    // This is less efficient but works with the current architecture
+    if (!this.adapter.listenToCollection) {
+      console.warn(
+        'Collection listeners not supported by current database adapter'
+      );
+      return null;
+    }
+
+    // Listen to creatures collection with ownerId filter
+    return this.adapter.listenToCollection<Creature>(
+      this.COLLECTION_NAME,
+      [{ field: 'ownerId', operator: '==', value: ownerId }],
+      (creatures) => {
+        // Since each user can only have one creature, get the first one
+        const creature = creatures.length > 0 ? creatures[0] : null;
+        callback(creature);
+      },
+      onError
+    );
+  }
+
+  /**
+   * Listen to real-time changes for a specific creature by ID
+   * @param creatureId - The creature's ID
+   * @param callback - Function called when creature data changes
+   * @param onError - Function called on errors
+   * @returns Unsubscribe function (call to stop listening)
+   */
+  listenToCreature(
+    creatureId: string,
+    callback: (creature: Creature | null) => void,
+    onError?: (error: Error) => void
+  ): (() => void) | null {
+    // Check if the adapter supports real-time listeners
+    if (!this.adapter.listenToDocument) {
+      console.warn(
+        'Real-time listeners not supported by current database adapter'
+      );
+      return null;
+    }
+
+    return this.adapter.listenToDocument<Creature>(
+      this.COLLECTION_NAME,
+      creatureId,
+      callback,
+      onError
+    );
+  }
 }

@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "functions:dev": "firebase emulators:start --only functions",
+    "functions:deploy": "firebase deploy --only functions",
+    "functions:build": "cd ../functions && bun run build"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
@@ -16,6 +19,7 @@
     "@hookform/resolvers": "^5.2.1",
     "firebase": "^12.1.0",
     "firebase-admin": "^13.4.0",
+    "firebase-functions": "^6.4.0",
     "framer-motion": "^6",
     "next": "15.4.6",
     "react": "19.1.0",

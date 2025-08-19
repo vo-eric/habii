@@ -3,13 +3,24 @@
 import { useCreature } from '@/lib/database/hooks/useCreature';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useState } from 'react';
+import { auth } from '@/lib/firebase';
+import CreatureActions from './CreatureActions';
 
 export default function CreatureDisplay() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [testLoading, setTestLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const { creature, createCreature } = useCreature();
+  const {
+    creature,
+    createCreature,
+    reload,
+    feedCreature,
+    playWithCreature,
+    restCreature,
+    loading: creatureLoading,
+  } = useCreature();
 
   const handleCreateCreature = async () => {
     if (!user?.uid) {
@@ -32,6 +43,57 @@ export default function CreatureDisplay() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTestDegradation = async () => {
+    if (!user) {
+      setError('Please log in first');
+      return;
+    }
+
+    setTestLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) {
+        throw new Error('Failed to get authentication token');
+      }
+
+      const response = await fetch(
+        'https://us-central1-habii-235d1.cloudfunctions.net/testDegradeCreatureStats',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Test degradation result:', result);
+
+      setSuccess(
+        `✅ Test completed! Updated ${result.count} creature(s). Real-time listener should have updated your stats automatically!`
+      );
+
+      // Note: No need to call reload() anymore since real-time listeners handle updates
+    } catch (error) {
+      console.error('Error testing degradation:', error);
+      setError(
+        error instanceof Error
+          ? `Test failed: ${error.message}`
+          : 'Failed to test degradation function'
+      );
+    } finally {
+      setTestLoading(false);
     }
   };
 
@@ -67,7 +129,33 @@ export default function CreatureDisplay() {
         >
           {loading ? 'Creating...' : 'Create Creature'}
         </button>
-      ) : null}
+      ) : (
+        <div className='space-y-4'>
+          <CreatureActions
+            feedCreature={feedCreature}
+            playWithCreature={playWithCreature}
+            restCreature={restCreature}
+            loading={creatureLoading}
+          />
+
+          {/* Test Real-time Updates */}
+          <div className='border-t pt-4'>
+            <h3 className='text-sm font-semibold text-gray-600 mb-2'>
+              🧪 Test Real-time Updates
+            </h3>
+            <button
+              onClick={handleTestDegradation}
+              disabled={testLoading}
+              className='w-full bg-purple-500 hover:bg-purple-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded transition-colors text-sm'
+            >
+              {testLoading ? 'Testing...' : '⚡ Test Stat Degradation'}
+            </button>
+            <p className='text-xs text-gray-500 mt-1'>
+              Trigger degradation and watch stats update in real-time!
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
