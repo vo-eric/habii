@@ -5,12 +5,13 @@ import { NextRequest, NextResponse } from 'next/server';
  * Get all creatures for a user (currently returns only one)
  */
 export async function GET(
-  request: Request,
-  { params }: { params: { userId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const { userId } = await params;
     const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
-    const creature = await creatureRepo.getByOwnerId(params.userId);
+    const creature = await creatureRepo.getByOwnerId(userId);
 
     if (!creature) {
       return NextResponse.json(
@@ -35,12 +36,13 @@ export async function GET(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { userId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const { userId } = await params;
     const creatureRepo = await ServerDatabaseFactory.getCreatureRepository();
-    await creatureRepo.deleteByOwnerId(params.userId);
+    await creatureRepo.deleteByOwnerId(userId);
 
     return NextResponse.json(
       { message: 'All creatures deleted successfully for user' },
