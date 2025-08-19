@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { auth } from '@/lib/firebase';
 import CreatureActions from './CreatureActions';
 import Lottie from 'lottie-react';
-import dogWalking from '~/public/dog_walking.json';
+import dogWalking from '~/public/dogWalking.json';
+import dogEating from '~/public/dogEating.json';
 
 export default function CreatureDisplay() {
   const { user } = useAuth();
@@ -105,7 +106,7 @@ export default function CreatureDisplay() {
         <>
           {/* <Lottie animationData={forest} className='absolute z-1  w-full' /> */}
           <Lottie
-            animationData={dogWalking}
+            animationData={dogEating}
             loop={true}
             className='absolute z-2 h-[250px] w-auto bottom-0 left-1/2 -translate-x-1/2'
           />
