@@ -5,6 +5,8 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import { useState } from 'react';
 import { auth } from '@/lib/firebase';
 import CreatureActions from './CreatureActions';
+import Lottie from 'lottie-react';
+import dogWalking from '~/public/dog_walking.json';
 
 export default function CreatureDisplay() {
   const { user } = useAuth();
@@ -98,15 +100,23 @@ export default function CreatureDisplay() {
   };
 
   return (
-    <div className='p-6 max-w-md mx-auto bg-white rounded-lg shadow-md text-black'>
+    <div className='h-[500px] w-full max-w-md mx-auto bg-white rounded-lg shadow-md text-black relative'>
       {creature && (
-        <div>
-          <h2 className='text-xl font-bold mb-2'>Creature Details</h2>
-          <p>Name: {creature.name}</p>
-          <p>Hunger: {creature.hunger}</p>
-          <p>Love: {creature.love}</p>
-          <p>Tiredness: {creature.tiredness}</p>
-        </div>
+        <>
+          {/* <Lottie animationData={forest} className='absolute z-1  w-full' /> */}
+          <Lottie
+            animationData={dogWalking}
+            loop={true}
+            className='absolute z-2 h-[250px] w-auto bottom-0 left-1/2 -translate-x-1/2'
+          />
+        </>
+        // <div>
+        //   <h2 className='text-xl font-bold mb-2'>Creature Details</h2>
+        //   <p>Name: {creature.name}</p>
+        //   <p>Hunger: {creature.hunger}</p>
+        //   <p>Love: {creature.love}</p>
+        //   <p>Tiredness: {creature.tiredness}</p>
+        // </div>
       )}
 
       {error && (
@@ -129,33 +139,32 @@ export default function CreatureDisplay() {
         >
           {loading ? 'Creating...' : 'Create Creature'}
         </button>
-      ) : (
-        <div className='space-y-4'>
-          <CreatureActions
-            feedCreature={feedCreature}
-            playWithCreature={playWithCreature}
-            restCreature={restCreature}
-            loading={creatureLoading}
-          />
+      ) : // <div className='space-y-4'>
+      //   <CreatureActions
+      //     feedCreature={feedCreature}
+      //     playWithCreature={playWithCreature}
+      //     restCreature={restCreature}
+      //     loading={creatureLoading}
+      //   />
 
-          {/* Test Real-time Updates */}
-          <div className='border-t pt-4'>
-            <h3 className='text-sm font-semibold text-gray-600 mb-2'>
-              🧪 Test Real-time Updates
-            </h3>
-            <button
-              onClick={handleTestDegradation}
-              disabled={testLoading}
-              className='w-full bg-purple-500 hover:bg-purple-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded transition-colors text-sm'
-            >
-              {testLoading ? 'Testing...' : '⚡ Test Stat Degradation'}
-            </button>
-            <p className='text-xs text-gray-500 mt-1'>
-              Trigger degradation and watch stats update in real-time!
-            </p>
-          </div>
-        </div>
-      )}
+      //   {/* Test Real-time Updates */}
+      //   <div className='border-t pt-4'>
+      //     <h3 className='text-sm font-semibold text-gray-600 mb-2'>
+      //       🧪 Test Real-time Updates
+      //     </h3>
+      //     <button
+      //       onClick={handleTestDegradation}
+      //       disabled={testLoading}
+      //       className='w-full bg-purple-500 hover:bg-purple-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded transition-colors text-sm'
+      //     >
+      //       {testLoading ? 'Testing...' : '⚡ Test Stat Degradation'}
+      //     </button>
+      //     <p className='text-xs text-gray-500 mt-1'>
+      //       Trigger degradation and watch stats update in real-time!
+      //     </p>
+      //   </div>
+      // </div>
+      null}
     </div>
   );
 }
