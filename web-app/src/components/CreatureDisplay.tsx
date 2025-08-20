@@ -94,6 +94,7 @@ export default function CreatureDisplay() {
           feedCreature={feedCreature}
           playWithCreature={playWithCreature}
           restCreature={restCreature}
+          creatureId={creature?.id}
         />
       </div>
     </>
