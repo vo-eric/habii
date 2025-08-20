@@ -4,9 +4,10 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import Lottie from 'lottie-react';
 import dogWalking from '~/public/dogWalking.json';
 import dogEating from '~/public/dogEating.json';
+import dogPlaying from '~/public/dogPlaying.json';
 import type { Creature } from '@/lib/database/client';
 
-type AnimationType = 'walking' | 'eating';
+type AnimationType = 'walking' | 'eating' | 'playing';
 
 interface AnimationConfig {
   data: unknown;
@@ -48,6 +49,11 @@ export default function CreatureAnimation({
         data: dogEating,
         loop: false,
         duration: calculateLottieDuration(dogEating),
+      },
+      playing: {
+        data: dogPlaying,
+        loop: false,
+        duration: calculateLottieDuration(dogPlaying),
       },
     }),
     []
@@ -93,7 +99,7 @@ export default function CreatureAnimation({
       triggerTemporaryAnimation('eating');
     }
     if (current.love > previous.love) {
-      triggerTemporaryAnimation('eating');
+      triggerTemporaryAnimation('playing');
     }
     if (current.tiredness < previous.tiredness) {
       triggerTemporaryAnimation('eating');
