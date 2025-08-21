@@ -93,7 +93,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         console.error('Failed to get ID token:', error);
       }
       const newSocket = io(
-        process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'http://localhost:3000',
+        process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'http://localhost:3001',
         {
           auth: {
             token,
