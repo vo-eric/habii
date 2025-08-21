@@ -10,6 +10,7 @@ import React, {
 } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthProvider';
+import { config, getWebSocketUrl } from '@/lib/config';
 import type {
   ServerToClientEvents,
   ClientToServerEvents,
@@ -98,24 +99,21 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         // Fallback to dev token if Firebase token fails
         token = 'dev-token';
       }
+      const websocketUrl = getWebSocketUrl();
       console.log('Connecting to WebSocket with token:', token);
-      console.log(
-        'WebSocket URL:',
-        process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'http://localhost:3001'
-      );
+      console.log('WebSocket URL:', websocketUrl);
 
-      const newSocket = io(
-        process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'http://localhost:3001',
-        {
-          auth: {
-            token,
-          },
-          transports: ['websocket', 'polling'],
-          reconnection: true,
-          reconnectionDelay: 1000,
-          reconnectionAttempts: 5,
-        }
-      );
+      const newSocket = io(websocketUrl, {
+        auth: {
+          token,
+        },
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionAttempts: 5,
+        timeout: 20000, // Increase timeout for production
+        forceNew: true,
+      });
 
       // Connection event handlers
       newSocket.on('connect', () => {
@@ -136,6 +134,16 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
       newSocket.on('connect_error', (error) => {
         console.error('WebSocket connection error:', error.message);
+        console.error('Connection error details:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+        });
+
+        // Log additional debugging info
+        console.log('Current environment:', config.app.environment);
+        console.log('WebSocket URL being used:', websocketUrl);
+        console.log('User authenticated:', !!user);
       });
 
       // Room events (simplified - no UI tracking needed)
