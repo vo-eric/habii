@@ -62,7 +62,6 @@ functions/.env
 # compiled output
 dist/
 build/
-lib/
 out/
 
 # runtime logs  

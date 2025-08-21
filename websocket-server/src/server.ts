@@ -34,6 +34,8 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3001',
   'https://habii-235d1.web.app',
   'https://habii-235d1.firebaseapp.com',
+  // Add your Vercel domain here
+  'https://habii-web-app.vercel.app',
   // Add your custom domain here if you have one
   // 'https://yourdomain.com'
 ];
