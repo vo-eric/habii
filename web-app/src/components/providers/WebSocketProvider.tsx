@@ -19,9 +19,7 @@ import type {
 interface WebSocketContextType {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
   connected: boolean;
-  connecting: boolean;
   creatureRoom: string | null;
-  roomMembers: string[];
   joinCreatureRoom: (creatureId: string) => Promise<void>;
   leaveCreatureRoom: (creatureId: string) => void;
   triggerAnimation: (
@@ -56,9 +54,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     ClientToServerEvents
   > | null>(null);
   const [connected, setConnected] = useState(false);
-  const [connecting, setConnecting] = useState(false);
   const [creatureRoom, setCreatureRoom] = useState<string | null>(null);
-  const [roomMembers, setRoomMembers] = useState<string[]>([]);
   const animationCallbacksRef = useRef<Set<(event: AnimationEvent) => void>>(
     new Set()
   );
@@ -73,7 +69,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         setSocket(null);
         setConnected(false);
         setCreatureRoom(null);
-        setRoomMembers([]);
       }
       return;
     }
@@ -83,7 +78,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       return;
     }
 
-    setConnecting(true);
     console.log('Initializing WebSocket connection...');
 
     // Get the user's ID token for authentication
@@ -115,7 +109,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       newSocket.on('connect', () => {
         console.log('WebSocket connected successfully');
         setConnected(true);
-        setConnecting(false);
 
         // Rejoin creature room if we were in one
         if (creatureRoom) {
@@ -127,28 +120,19 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       newSocket.on('disconnect', (reason) => {
         console.log('WebSocket disconnected:', reason);
         setConnected(false);
-        setConnecting(false);
       });
 
       newSocket.on('connect_error', (error) => {
         console.error('WebSocket connection error:', error.message);
-        setConnecting(false);
       });
 
-      // Room events
+      // Room events (simplified - no UI tracking needed)
       newSocket.on('user:joined', ({ userId, userName }) => {
         console.log(`User ${userName || userId} joined the room`);
-        setRoomMembers((prev) => [...new Set([...prev, userId])]);
       });
 
       newSocket.on('user:left', ({ userId, userName }) => {
         console.log(`User ${userName || userId} left the room`);
-        setRoomMembers((prev) => prev.filter((id) => id !== userId));
-      });
-
-      newSocket.on('room:members', (members) => {
-        console.log('Room members updated:', members);
-        setRoomMembers(members);
       });
 
       // Animation sync event
@@ -211,7 +195,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
       socket.emit('creature:leave', creatureId);
       setCreatureRoom(null);
-      setRoomMembers([]);
       console.log(`Left creature room: ${creatureId}`);
     },
     [socket]
@@ -268,9 +251,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const value: WebSocketContextType = {
     socket,
     connected,
-    connecting,
     creatureRoom,
-    roomMembers,
     joinCreatureRoom,
     leaveCreatureRoom,
     triggerAnimation,
