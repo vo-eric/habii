@@ -17,7 +17,7 @@ interface AnimationConfig {
   duration?: number;
 }
 
-const TRANSITION_DURATION = 100;
+const TRANSITION_DURATION = 200;
 
 const calculateLottieDuration = (lottieData: unknown): number => {
   const data = lottieData as { op: number; fr: number };
@@ -137,13 +137,6 @@ export default function CreatureAnimation({
       const now = Date.now();
       const delay = event.timestamp - now;
 
-      console.log('📡 Received WebSocket animation event:', {
-        type: event.type,
-        from: event.userName || event.userId,
-        delay: delay + 'ms',
-        willTrigger: delay > -1000, // Allow up to 1 second late
-      });
-
       // Map event types to animation types
       const animationTypeMap: Record<string, AnimationType> = {
         feed: 'eating',
@@ -152,10 +145,7 @@ export default function CreatureAnimation({
       };
 
       const animationType = animationTypeMap[event.type];
-      if (!animationType) {
-        console.warn('Unknown animation type:', event.type);
-        return;
-      }
+      if (!animationType) return;
 
       // Clear any existing scheduled animation
       if (scheduledTimeoutRef.current) {
@@ -163,30 +153,11 @@ export default function CreatureAnimation({
         scheduledTimeoutRef.current = null;
       }
 
-      // Schedule the animation
-      if (delay > -1000) {
-        // If delay is negative but within 1 second, play immediately
-        const actualDelay = Math.max(0, delay);
-
-        if (actualDelay === 0) {
-          console.log(`🎯 Playing ${animationType} animation immediately`);
-          triggerTemporaryAnimation(animationType);
-        } else {
-          console.log(
-            `🎬 Scheduling ${animationType} animation to fire in ${actualDelay}ms`
-          );
-          scheduledTimeoutRef.current = setTimeout(() => {
-            console.log(`🎯 FIRING ${animationType} animation NOW!`);
-            triggerTemporaryAnimation(animationType);
-          }, actualDelay);
-        }
-      } else {
-        console.log(
-          `⏰ Animation scheduled time has passed (${Math.abs(
-            delay
-          )}ms ago), skipping`
-        );
-      }
+      // Schedule the animation (immediate if time has passed)
+      const actualDelay = Math.max(0, delay);
+      scheduledTimeoutRef.current = setTimeout(() => {
+        triggerTemporaryAnimation(animationType);
+      }, actualDelay);
     });
 
     return () => {
@@ -237,9 +208,6 @@ export default function CreatureAnimation({
             <span className='ml-1'>
               ({Math.round(animations[currentAnimation].duration! / 1000)}s)
             </span>
-          )}
-          {connected && (
-            <div className='text-green-600'>🟢 WebSocket Connected</div>
           )}
         </div>
       )}
