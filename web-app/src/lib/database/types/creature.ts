@@ -11,9 +11,6 @@ export interface Creature {
   hunger: number;
   love: number;
   tiredness: number;
-  // Animation synchronization fields
-  animationScheduledAt?: Date;
-  pendingAnimation?: 'eating' | 'playing' | 'resting';
 }
 
 export interface CreateCreatureDTO {
@@ -30,9 +27,6 @@ export interface UpdateCreatureDTO {
   hunger?: number;
   love?: number;
   tiredness?: number;
-  // Animation scheduling
-  animationScheduledAt?: Date;
-  pendingAnimation?: 'eating' | 'playing' | 'resting';
 }
 
 export interface CreatureFilters {
