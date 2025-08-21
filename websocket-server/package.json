@@ -4,9 +4,9 @@
   "description": "Standalone WebSocket server for Habii animation synchronization",
   "main": "src/server.ts",
   "scripts": {
-    "dev": "bun run src/server.ts",
+    "dev": "NODE_ENV=development bun run src/server.ts",
     "build": "bun build src/server.ts --outdir dist --target node",
-    "start": "bun run src/server.ts"
+    "start": "NODE_ENV=production bun run src/server.ts"
   },
   "dependencies": {
     "socket.io": "^4.7.5",

@@ -63,13 +63,38 @@ const io: TypedServer = new SocketIOServer(httpServer, {
 io.use(async (socket: TypedSocket, next) => {
   try {
     const token = socket.handshake.auth.token;
+    const origin = socket.handshake.headers.origin;
+
+    console.log(`Authentication attempt from origin: ${origin}`);
+    console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+    console.log(`Token provided: ${token ? 'Yes' : 'No'}`);
+    console.log(
+      `Token value: ${
+        token === 'dev-token' ? 'dev-token' : token ? 'firebase-token' : 'none'
+      }`
+    );
 
     if (!token) {
+      console.error('No authentication token provided');
       return next(new Error('No authentication token provided'));
     }
 
     // Skip token verification in development
-    if (process.env.NODE_ENV === 'development' && token === 'dev-token') {
+    if (
+      (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) &&
+      token === 'dev-token'
+    ) {
+      console.log('Using development token authentication');
+      socket.data.user = {
+        uid: 'dev-user-' + Math.random().toString(36).substr(2, 9),
+        email: 'dev@example.com',
+      };
+      return next();
+    }
+
+    // Temporary: Allow any token in development for debugging
+    if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
+      console.log('Temporary development bypass - accepting any token');
       socket.data.user = {
         uid: 'dev-user-' + Math.random().toString(36).substr(2, 9),
         email: 'dev@example.com',
@@ -78,6 +103,7 @@ io.use(async (socket: TypedSocket, next) => {
     }
 
     // Verify Firebase ID token
+    console.log('Attempting Firebase token verification...');
     const decodedToken = await auth.verifyIdToken(token);
 
     // Store user data in socket
@@ -90,6 +116,11 @@ io.use(async (socket: TypedSocket, next) => {
     next();
   } catch (error) {
     console.error('Socket authentication error:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      code: (error as any)?.code,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     next(new Error('Authentication failed'));
   }
 });
@@ -206,4 +237,15 @@ const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
   console.log(`🚀 WebSocket server running on port ${PORT}`);
   console.log(`📡 Socket.IO initialized`);
+  console.log(
+    `🌍 Environment: ${process.env.NODE_ENV || 'development (default)'}`
+  );
+  console.log(
+    `🔐 Development auth: ${
+      process.env.NODE_ENV === 'development' || !process.env.NODE_ENV
+        ? 'enabled'
+        : 'disabled'
+    }`
+  );
+  console.log(`🌐 Allowed origins: ${allowedOrigins.join(', ')}`);
 });

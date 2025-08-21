@@ -87,11 +87,23 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       try {
         // In production, get the actual Firebase ID token
         if (process.env.NODE_ENV === 'production') {
+          console.log('Getting Firebase ID token for production...');
           token = await user.getIdToken();
+          console.log('Firebase ID token obtained successfully');
+        } else {
+          console.log('Using development token');
         }
       } catch (error) {
         console.error('Failed to get ID token:', error);
+        // Fallback to dev token if Firebase token fails
+        token = 'dev-token';
       }
+      console.log('Connecting to WebSocket with token:', token);
+      console.log(
+        'WebSocket URL:',
+        process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'http://localhost:3001'
+      );
+
       const newSocket = io(
         process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'http://localhost:3001',
         {
