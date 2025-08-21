@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Lottie from 'lottie-react';
 import dogWalking from '~/public/dogWalking.json';
 import dogEating from '~/public/dogEating.json';
 import dogPlaying from '~/public/dogPlaying.json';
 import type { Creature } from '@/lib/database/client';
+import { useWebSocket } from '@/components/providers/WebSocketProvider';
+import type { AnimationEvent } from '@/lib/websocket/types';
 
-type AnimationType = 'walking' | 'eating' | 'playing';
+type AnimationType = 'walking' | 'eating' | 'playing' | 'resting';
 
 interface AnimationConfig {
   data: unknown;
   loop: boolean;
   duration?: number;
 }
+
+const TRANSITION_DURATION = 200;
 
 const calculateLottieDuration = (lottieData: unknown): number => {
   const data = lottieData as { op: number; fr: number };
@@ -36,8 +40,11 @@ export default function CreatureAnimation({
     useState<AnimationType>('walking');
   const [isPlayingTemporaryAnimation, setIsPlayingTemporaryAnimation] =
     useState(false);
-  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const previousCreatureRef = useRef<Creature | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scheduledTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { onAnimationSync, joinCreatureRoom, connected } = useWebSocket();
 
   const animations = useMemo<Record<AnimationType, AnimationConfig>>(
     () => ({
@@ -55,34 +62,121 @@ export default function CreatureAnimation({
         loop: false,
         duration: calculateLottieDuration(dogPlaying),
       },
+      resting: {
+        data: dogEating, // You might want a separate resting animation
+        loop: false,
+        duration: calculateLottieDuration(dogEating),
+      },
     }),
     []
   );
 
-  const triggerTemporaryAnimation = (animationType: AnimationType) => {
-    if (isPlayingTemporaryAnimation) return;
+  const triggerTemporaryAnimation = useCallback(
+    (animationType: AnimationType) => {
+      console.log(`🎬 triggerTemporaryAnimation called with: ${animationType}`);
 
-    const config = animations[animationType];
+      if (isPlayingTemporaryAnimation || isTransitioning) {
+        console.log(
+          `❌ Animation blocked - already playing: ${isPlayingTemporaryAnimation}, transitioning: ${isTransitioning}`
+        );
+        return;
+      }
 
-    setIsPlayingTemporaryAnimation(true);
-    setCurrentAnimation(animationType);
+      const config = animations[animationType];
 
-    if (animationTimeoutRef.current) {
-      clearTimeout(animationTimeoutRef.current);
-    }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
-    if (config.duration) {
-      animationTimeoutRef.current = setTimeout(() => {
+      const showAnimation = () => {
+        setIsPlayingTemporaryAnimation(true);
+        setCurrentAnimation(animationType);
+        setIsTransitioning(false);
+
+        if (config.duration) {
+          timeoutRef.current = setTimeout(
+            startReturnTransition,
+            config.duration
+          );
+        }
+      };
+
+      const startReturnTransition = () => {
+        setIsTransitioning(true);
+        timeoutRef.current = setTimeout(returnToWalking, TRANSITION_DURATION);
+      };
+
+      const returnToWalking = () => {
         setCurrentAnimation('walking');
         setIsPlayingTemporaryAnimation(false);
-      }, config.duration);
-    }
-  };
+        setIsTransitioning(false);
+      };
 
+      // Start the sequence
+      setIsTransitioning(true);
+      timeoutRef.current = setTimeout(showAnimation, TRANSITION_DURATION);
+    },
+    [animations, isPlayingTemporaryAnimation, isTransitioning]
+  );
+
+  // Join creature room when creature is loaded
+  useEffect(() => {
+    if (creature && connected) {
+      joinCreatureRoom(creature.id).catch(console.error);
+    }
+  }, [creature, connected, joinCreatureRoom]);
+
+  // WebSocket animation sync
+  useEffect(() => {
+    if (!creature) return;
+
+    const unsubscribe = onAnimationSync((event: AnimationEvent) => {
+      // Only handle events for our creature
+      if (event.creatureId !== creature.id) return;
+
+      const now = Date.now();
+      const delay = event.timestamp - now;
+
+      // Map event types to animation types
+      const animationTypeMap: Record<string, AnimationType> = {
+        feed: 'eating',
+        play: 'playing',
+        rest: 'resting',
+      };
+
+      const animationType = animationTypeMap[event.type];
+      if (!animationType) return;
+
+      // Clear any existing scheduled animation
+      if (scheduledTimeoutRef.current) {
+        clearTimeout(scheduledTimeoutRef.current);
+        scheduledTimeoutRef.current = null;
+      }
+
+      // Schedule the animation (immediate if time has passed)
+      const actualDelay = Math.max(0, delay);
+      scheduledTimeoutRef.current = setTimeout(() => {
+        triggerTemporaryAnimation(animationType);
+      }, actualDelay);
+    });
+
+    return () => {
+      unsubscribe();
+      if (scheduledTimeoutRef.current) {
+        clearTimeout(scheduledTimeoutRef.current);
+        scheduledTimeoutRef.current = null;
+      }
+    };
+  }, [creature, onAnimationSync, triggerTemporaryAnimation]);
+
+  // Cleanup
   useEffect(() => {
     return () => {
-      if (animationTimeoutRef.current) {
-        clearTimeout(animationTimeoutRef.current);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (scheduledTimeoutRef.current) {
+        clearTimeout(scheduledTimeoutRef.current);
       }
     };
   }, []);
@@ -91,35 +185,25 @@ export default function CreatureAnimation({
     return null;
   }
 
-  if (previousCreatureRef.current) {
-    const previous = previousCreatureRef.current;
-    const current = creature;
-
-    if (current.hunger > previous.hunger) {
-      triggerTemporaryAnimation('eating');
-    }
-    if (current.love > previous.love) {
-      triggerTemporaryAnimation('playing');
-    }
-    if (current.tiredness < previous.tiredness) {
-      triggerTemporaryAnimation('eating');
-    }
-  }
-
-  previousCreatureRef.current = { ...creature };
-
   return (
-    <div className={`relative`}>
-      <Lottie
-        animationData={animations[currentAnimation].data}
-        loop={animations[currentAnimation].loop}
-        className='h-[250px] w-auto mx-auto'
-      />
+    <div className='relative'>
+      <div
+        className={`transition-opacity duration-300 ease-in-out ${
+          isTransitioning ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
+        <Lottie
+          animationData={animations[currentAnimation].data}
+          loop={animations[currentAnimation].loop}
+          className='h-[250px] w-auto mx-auto'
+        />
+      </div>
 
-      {/* TODO: remove */}
+      {/* Development debug info only */}
       {process.env.NODE_ENV === 'development' && (
         <div className='absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded'>
-          {currentAnimation} {isPlayingTemporaryAnimation && '(temp)'}
+          {currentAnimation} {isPlayingTemporaryAnimation && '(temp)'}{' '}
+          {isTransitioning && '(transitioning)'}
           {animations[currentAnimation].duration && (
             <span className='ml-1'>
               ({Math.round(animations[currentAnimation].duration! / 1000)}s)

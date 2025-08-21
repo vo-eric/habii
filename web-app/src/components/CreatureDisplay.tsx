@@ -90,11 +90,7 @@ export default function CreatureDisplay() {
         )}
       </div>
       <div>
-        <CreatureActions
-          feedCreature={feedCreature}
-          playWithCreature={playWithCreature}
-          restCreature={restCreature}
-        />
+        <CreatureActions />
       </div>
     </>
   );
