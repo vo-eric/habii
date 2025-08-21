@@ -4,6 +4,7 @@ import React from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
 import theme from '@/styles/theme';
 import { AuthProvider } from './AuthProvider';
+import { WebSocketProvider } from './WebSocketProvider';
 import { Navigation } from '@/components/Navigation';
 
 interface ClientProvidersProps {
@@ -16,8 +17,10 @@ export const ClientProviders: React.FC<ClientProvidersProps> = ({
   return (
     <ChakraProvider theme={theme}>
       <AuthProvider>
-        <Navigation />
-        {children}
+        <WebSocketProvider>
+          <Navigation />
+          {children}
+        </WebSocketProvider>
       </AuthProvider>
     </ChakraProvider>
   );

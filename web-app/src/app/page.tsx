@@ -10,7 +10,6 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { useAuth } from '@/components/providers/AuthProvider';
-
 import CreatureDisplay from '@/components/CreatureDisplay';
 
 export default function Home() {
