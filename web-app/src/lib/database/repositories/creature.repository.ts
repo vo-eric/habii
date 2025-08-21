@@ -77,7 +77,7 @@ export class CreatureRepository {
     const newHunger = creature.hunger + amount;
 
     return this.update(id, {
-      hunger: Math.min(100, creature.hunger + amount),
+      hunger: Math.min(100, newHunger),
       tiredness: newHunger > 100 ? creature.tiredness + 5 : creature.tiredness,
     });
   }
@@ -104,7 +104,10 @@ export class CreatureRepository {
     }
 
     const newTiredness = Math.max(0, creature.tiredness - duration);
-    return this.update(id, { tiredness: newTiredness });
+
+    return this.update(id, {
+      tiredness: newTiredness,
+    });
   }
 
   async delete(id: string): Promise<void> {
