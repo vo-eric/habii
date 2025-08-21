@@ -29,10 +29,21 @@ const app = express();
 const httpServer = createServer(app);
 
 // CORS middleware
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
-  credentials: true,
-}));
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://habii-235d1.web.app',
+  'https://habii-235d1.firebaseapp.com',
+  // Add your custom domain here if you have one
+  // 'https://yourdomain.com'
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -42,7 +53,7 @@ app.get('/health', (req, res) => {
 // Initialize Socket.IO
 const io: TypedServer = new SocketIOServer(httpServer, {
   cors: {
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: allowedOrigins,
     credentials: true,
   },
   transports: ['websocket', 'polling'],
