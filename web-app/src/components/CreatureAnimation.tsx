@@ -7,7 +7,7 @@ import dogEating from '~/public/dogEating.json';
 import dogPlaying from '~/public/dogPlaying.json';
 import type { Creature } from '@/lib/database/client';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
-import type { AnimationEvent } from '@/lib/websocket/types';
+import type { AnimationEvent } from '@/lib/websocket';
 
 type AnimationType = 'walking' | 'eating' | 'playing' | 'resting';
 

@@ -14,7 +14,7 @@ import type {
   ServerToClientEvents,
   ClientToServerEvents,
   AnimationEvent,
-} from '@/lib/websocket/types';
+} from '@/lib/websocket';
 
 interface WebSocketContextType {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
