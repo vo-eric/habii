@@ -83,21 +83,27 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
     // Get the user's ID token for authentication
     const initializeSocket = async () => {
-      let token = 'dev-token';
+      let token: string;
 
       try {
-        // In production, get the actual Firebase ID token
-        if (process.env.NODE_ENV === 'production') {
-          console.log('Getting Firebase ID token for production...');
-          token = await user.getIdToken();
-          console.log('Firebase ID token obtained successfully');
-        } else {
-          console.log('Using development token');
-        }
+        // Always get Firebase ID token - no fallback to dev token in production
+        console.log('Getting Firebase ID token...');
+        token = await user.getIdToken();
+        console.log('Firebase ID token obtained successfully');
       } catch (error) {
         console.error('Failed to get ID token:', error);
-        // Fallback to dev token if Firebase token fails
-        token = 'dev-token';
+
+        // Only use dev token in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Using development token as fallback');
+          token = 'dev-token';
+        } else {
+          // In production, fail if we can't get a valid token
+          console.error(
+            'Cannot connect to WebSocket: Firebase token retrieval failed'
+          );
+          return; // Don't create socket connection
+        }
       }
       const websocketUrl = getWebSocketUrl();
       console.log('Connecting to WebSocket with token:', token);
