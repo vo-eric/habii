@@ -33,6 +33,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3000',
   'http://localhost:3001',
   'http://localhost:8889', // Electron desktop app
+  'http://192.168.1.56', // Raspberry Pi
   'https://habii-235d1.web.app',
   'https://habii-235d1.firebaseapp.com',
   // Add your Vercel domain here
@@ -95,8 +96,15 @@ io.use(async (socket: TypedSocket, next) => {
       return next();
     }
 
-    // Accept desktop tokens in production for Electron app
-    if (token === 'dev-token' && origin === 'http://localhost:8889') {
+    // Accept desktop tokens in production for Electron app (including Pi)
+    if (
+      token === 'dev-token' &&
+      (origin === 'http://localhost:8889' ||
+        origin?.startsWith('http://192.168.') ||
+        origin?.startsWith('http://10.') ||
+        origin?.startsWith('http://172.') ||
+        !origin) // Allow connections without origin (local apps)
+    ) {
       console.log('Desktop app detected - accepting development token');
       socket.data.user = {
         uid: '6wbqAvVg9VaVBC5Ywgyolv2hi5M2', // Eric Vo's UID
