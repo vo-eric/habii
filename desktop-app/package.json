@@ -1,0 +1,72 @@
+{
+  "name": "habii-desktop",
+  "version": "1.0.0",
+  "description": "Desktop version of Habii for Raspberry Pi",
+  "author": "Habii Team",
+  "main": "main/background.js",
+  "scripts": {
+    "dev": "concurrently \"bun run dev:renderer\" \"bun run dev:main\"",
+    "dev:renderer": "cd renderer && bun run dev",
+    "dev:main": "bun run build:main && NODE_ENV=development ./node_modules/.bin/electron main/background.js",
+    "start:renderer": "cd renderer && bun run start",
+    "clean": "rm -rf main/*.js renderer/.next renderer/out dist",
+    "build": "bun run clean && bun run build:renderer && bun run build:main && bun run build:electron",
+    "build:renderer": "cd renderer && NODE_ENV=production bun run build",
+    "build:main": "tsc main/*.ts --outDir main --target es2020 --module commonjs --moduleResolution node --esModuleInterop --allowSyntheticDefaultImports",
+    "build:electron": "electron-builder",
+    "build:win": "bun run build:renderer && bun run build:main && electron-builder --win",
+    "build:mac": "bun run build:renderer && bun run build:main && electron-builder --mac",
+    "build:linux": "bun run build:renderer && bun run build:main && electron-builder --linux",
+    "build:pi": "bun run build:renderer && bun run build:main && electron-builder --linux --arm64",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "next": "15.4.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "concurrently": "^9.2.0",
+    "typescript": "^5.9.2",
+    "electron": "^37.3.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.habii.desktop",
+    "productName": "Habii",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main/**/*",
+      "renderer/out/**/*",
+      "renderer/public/**/*",
+      "!renderer/node_modules/.cache",
+      "!renderer/.next",
+      "!renderer/src",
+      "!renderer/tsconfig.json",
+      "!renderer/next.config.ts",
+      "!renderer/next.config.desktop.ts",
+      "!renderer/postcss.config.mjs",
+      "!renderer/tailwind.config.ts",
+      "!renderer/bun.lock",
+      "package.json"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    }
+  }
+}
