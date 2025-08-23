@@ -5,11 +5,12 @@ import Lottie from 'lottie-react';
 import dogWalking from '~/public/dogWalking.json';
 import dogEating from '~/public/dogEating.json';
 import dogPlaying from '~/public/dogPlaying.json';
+import dogPooping from '~/public/dogPooping.json';
 import type { Creature } from '@/lib/database/client';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
 import type { AnimationEvent } from '@/lib/websocket';
 
-type AnimationType = 'walking' | 'eating' | 'playing' | 'resting';
+type AnimationType = 'walking' | 'eating' | 'playing' | 'resting' | 'pooping';
 
 interface AnimationConfig {
   data: unknown;
@@ -62,14 +63,37 @@ export default function CreatureAnimation({
         loop: false,
         duration: calculateLottieDuration(dogPlaying),
       },
-      resting: {
-        data: dogEating, // You might want a separate resting animation
+      pooping: {
+        data: dogPooping,
         loop: false,
-        duration: calculateLottieDuration(dogEating),
+        duration: calculateLottieDuration(dogPooping),
+      },
+      resting: {
+        data: dogPooping, // You might want a separate resting animation
+        loop: false,
+        duration: calculateLottieDuration(dogPooping),
       },
     }),
     []
   );
+
+  const maybeTriggerTemporaryAnimation = () => {
+    const random = Math.random();
+
+    if (random >= 0.5) {
+      fireTemporaryAnimation();
+    }
+  };
+
+  const fireTemporaryAnimation = () => {
+    switch (true) {
+      case creature && creature.hunger >= 80:
+        triggerTemporaryAnimation('pooping');
+        break;
+      default:
+        break;
+    }
+  };
 
   const triggerTemporaryAnimation = useCallback(
     (animationType: AnimationType) => {
@@ -188,10 +212,15 @@ export default function CreatureAnimation({
   return (
     <div className='relative'>
       <div
-        className={`transition-opacity duration-300 ease-in-out ${
+        className={`transition-opacity duration-300 ease-in-out relative ${
           isTransitioning ? 'opacity-0' : 'opacity-100'
         }`}
       >
+        <div
+          className='absolute border-4 border-indigo-600 size-10 z-1 bg-amber-400'
+          onClick={maybeTriggerTemporaryAnimation}
+        />
+
         <Lottie
           animationData={animations[currentAnimation].data}
           loop={animations[currentAnimation].loop}
