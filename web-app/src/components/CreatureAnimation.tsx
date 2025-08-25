@@ -7,6 +7,7 @@ import dogEating from '~/public/dogEating.json';
 import dogPlaying from '~/public/dogPlaying.json';
 import dogPetting from '~/public/dogPetting.json';
 import dogPooping from '~/public/dogPooping.json';
+import dogSleeping from '~/public/dogSleeping.json';
 import type { Creature } from '@/lib/database/client';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
 import type { AnimationEvent } from '@/lib/websocket';
@@ -80,10 +81,11 @@ export default function CreatureAnimation({
         loop: false,
         duration: calculateLottieDuration(dogPetting),
       },
+
       resting: {
-        data: dogPooping, // You might want a separate resting animation
+        data: dogSleeping,
         loop: false,
-        duration: calculateLottieDuration(dogPooping),
+        duration: calculateLottieDuration(dogSleeping),
       },
     }),
     []
