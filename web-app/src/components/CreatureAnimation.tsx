@@ -102,16 +102,14 @@ export default function CreatureAnimation({
   const fireTemporaryAnimation = () => {
     switch (true) {
       case creature && creature.hunger >= 80:
-        triggerTemporaryAnimation('pooping');
-        // Also trigger websocket animation
         if (connected && creature) {
+          // Trigger websocket animation (sync will handle local play)
           triggerAnimation('poop', creature.id).catch(console.error);
         }
         break;
       default:
-        triggerTemporaryAnimation('petting');
-        // Also trigger websocket animation
         if (connected && creature) {
+          // Trigger websocket animation (sync will handle local play)
           triggerAnimation('pet', creature.id).catch(console.error);
         }
         break;
@@ -216,7 +214,7 @@ export default function CreatureAnimation({
         scheduledTimeoutRef.current = null;
       }
     };
-  }, [creature, onAnimationSync, triggerTemporaryAnimation]);
+  }, [creature, onAnimationSync, triggerAnimation, triggerTemporaryAnimation]);
 
   // Cleanup
   useEffect(() => {
