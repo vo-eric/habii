@@ -53,7 +53,8 @@ export default function CreatureAnimation({
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scheduledTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { onAnimationSync, joinCreatureRoom, connected } = useWebSocket();
+  const { onAnimationSync, joinCreatureRoom, connected, triggerAnimation } =
+    useWebSocket();
 
   const animations = useMemo<Record<AnimationType, AnimationConfig>>(
     () => ({
@@ -81,7 +82,6 @@ export default function CreatureAnimation({
         loop: false,
         duration: calculateLottieDuration(dogPetting),
       },
-
       resting: {
         data: dogSleeping,
         loop: false,
@@ -103,9 +103,17 @@ export default function CreatureAnimation({
     switch (true) {
       case creature && creature.hunger >= 80:
         triggerTemporaryAnimation('pooping');
+        // Also trigger websocket animation
+        if (connected && creature) {
+          triggerAnimation('poop', creature.id).catch(console.error);
+        }
         break;
       default:
         triggerTemporaryAnimation('petting');
+        // Also trigger websocket animation
+        if (connected && creature) {
+          triggerAnimation('pet', creature.id).catch(console.error);
+        }
         break;
     }
   };
@@ -181,6 +189,8 @@ export default function CreatureAnimation({
         feed: 'eating',
         play: 'playing',
         rest: 'resting',
+        poop: 'pooping',
+        pet: 'petting',
       };
 
       const animationType = animationTypeMap[event.type];
