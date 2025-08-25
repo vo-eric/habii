@@ -12,13 +12,7 @@ export default function CreatureDisplay() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const {
-    creature,
-    createCreature,
-    feedCreature,
-    playWithCreature,
-    restCreature,
-  } = useCreature();
+  const { creature, createCreature } = useCreature();
 
   const handleCreateCreature = async () => {
     if (!user?.uid) {
