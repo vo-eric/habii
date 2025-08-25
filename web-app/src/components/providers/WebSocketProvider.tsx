@@ -226,8 +226,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     [socket]
   );
 
-  // Trigger animation
-  const triggerAnimation = useCallback(
+  // Broadcast animation event to server for cross-platform sync
+  const broadcastAnimation = useCallback(
     async (
       type: 'feed' | 'play' | 'rest' | 'pet' | 'poop',
       creatureId: string
@@ -249,12 +249,17 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           },
           (response) => {
             if (response?.success) {
-              console.log(`Animation ${type} triggered successfully`);
+              console.log(`Animation ${type} sent to server successfully`);
               resolve();
             } else {
-              console.error('Failed to trigger animation:', response?.error);
+              console.error(
+                'Failed to send animation to server:',
+                response?.error
+              );
               reject(
-                new Error(response?.error || 'Failed to trigger animation')
+                new Error(
+                  response?.error || 'Failed to send animation to server'
+                )
               );
             }
           }
@@ -283,7 +288,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     creatureRoom,
     joinCreatureRoom,
     leaveCreatureRoom,
-    triggerAnimation,
+    triggerAnimation: broadcastAnimation,
     onAnimationSync,
   };
 

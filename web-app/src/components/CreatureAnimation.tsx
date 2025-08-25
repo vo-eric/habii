@@ -91,34 +91,34 @@ export default function CreatureAnimation({
     []
   );
 
-  const maybeTriggerTemporaryAnimation = () => {
+  const handleCreatureClick = () => {
     const random = Math.random();
 
     if (random >= 0.5) {
-      fireTemporaryAnimation();
+      broadcastRandomAnimation();
     }
   };
 
-  const fireTemporaryAnimation = () => {
+  const broadcastRandomAnimation = () => {
     switch (true) {
       case creature && creature.hunger >= 80:
         if (connected && creature) {
-          // Trigger websocket animation (sync will handle local play)
+          // Send animation to server (sync will handle local play)
           triggerAnimation('poop', creature.id).catch(console.error);
         }
         break;
       default:
-        if (connected && creature) {
-          // Trigger websocket animation (sync will handle local play)
+        if (creature) {
+          // Send animation to server (sync will handle local play)
           triggerAnimation('pet', creature.id).catch(console.error);
         }
         break;
     }
   };
 
-  const triggerTemporaryAnimation = useCallback(
+  const displayAnimation = useCallback(
     (animationType: AnimationType) => {
-      console.log(`🎬 triggerTemporaryAnimation called with: ${animationType}`);
+      console.log(`🎬 displayAnimation called with: ${animationType}`);
 
       if (isPlayingTemporaryAnimation || isTransitioning) {
         console.log(
@@ -203,7 +203,7 @@ export default function CreatureAnimation({
       // Schedule the animation (immediate if time has passed)
       const actualDelay = Math.max(0, delay);
       scheduledTimeoutRef.current = setTimeout(() => {
-        triggerTemporaryAnimation(animationType);
+        displayAnimation(animationType);
       }, actualDelay);
     });
 
@@ -214,7 +214,7 @@ export default function CreatureAnimation({
         scheduledTimeoutRef.current = null;
       }
     };
-  }, [creature, onAnimationSync, triggerAnimation, triggerTemporaryAnimation]);
+  }, [creature, onAnimationSync, triggerAnimation, displayAnimation]);
 
   // Cleanup
   useEffect(() => {
@@ -241,7 +241,7 @@ export default function CreatureAnimation({
       >
         <div
           className='absolute border-4 border-indigo-600 size-10 z-1 bg-amber-400'
-          onClick={maybeTriggerTemporaryAnimation}
+          onClick={handleCreatureClick}
         />
 
         <Lottie
