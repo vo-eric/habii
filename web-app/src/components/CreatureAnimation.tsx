@@ -81,7 +81,6 @@ export default function CreatureAnimation({
         loop: false,
         duration: calculateLottieDuration(dogPetting),
       },
-
       resting: {
         data: dogSleeping,
         loop: false,
@@ -181,6 +180,8 @@ export default function CreatureAnimation({
         feed: 'eating',
         play: 'playing',
         rest: 'resting',
+        poop: 'pooping',
+        pet: 'petting',
       };
 
       const animationType = animationTypeMap[event.type];
