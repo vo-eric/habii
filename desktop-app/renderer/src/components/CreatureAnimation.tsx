@@ -53,7 +53,8 @@ export default function CreatureAnimation({
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scheduledTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { onAnimationSync, joinCreatureRoom, connected } = useWebSocket();
+  const { onAnimationSync, joinCreatureRoom, connected, triggerAnimation } =
+    useWebSocket();
 
   const animations = useMemo<Record<AnimationType, AnimationConfig>>(
     () => ({
@@ -90,9 +91,34 @@ export default function CreatureAnimation({
     []
   );
 
-  const triggerTemporaryAnimation = useCallback(
+  const handleCreatureClick = () => {
+    const random = Math.random();
+
+    if (random >= 0.5) {
+      broadcastRandomAnimation();
+    }
+  };
+
+  const broadcastRandomAnimation = () => {
+    switch (true) {
+      case creature && creature.hunger >= 80:
+        if (connected && creature) {
+          // Send animation to server (sync will handle local play)
+          triggerAnimation('poop', creature.id).catch(console.error);
+        }
+        break;
+      default:
+        if (connected && creature) {
+          // Send animation to server (sync will handle local play)
+          triggerAnimation('pet', creature.id).catch(console.error);
+        }
+        break;
+    }
+  };
+
+  const displayAnimation = useCallback(
     (animationType: AnimationType) => {
-      console.log(`🎬 triggerTemporaryAnimation called with: ${animationType}`);
+      console.log(`🎬 displayAnimation called with: ${animationType}`);
 
       if (isPlayingTemporaryAnimation || isTransitioning) {
         console.log(
@@ -177,7 +203,7 @@ export default function CreatureAnimation({
       // Schedule the animation (immediate if time has passed)
       const actualDelay = Math.max(0, delay);
       scheduledTimeoutRef.current = setTimeout(() => {
-        triggerTemporaryAnimation(animationType);
+        displayAnimation(animationType);
       }, actualDelay);
     });
 
@@ -188,7 +214,7 @@ export default function CreatureAnimation({
         scheduledTimeoutRef.current = null;
       }
     };
-  }, [creature, onAnimationSync, triggerTemporaryAnimation]);
+  }, [creature, onAnimationSync, displayAnimation]);
 
   // Cleanup
   useEffect(() => {
@@ -213,6 +239,10 @@ export default function CreatureAnimation({
           isTransitioning ? 'opacity-0' : 'opacity-100'
         }`}
       >
+        <div
+          className='absolute border-4 border-indigo-600 size-10 z-1 bg-amber-400'
+          onClick={handleCreatureClick}
+        />
         <Lottie
           animationData={animations[currentAnimation].data}
           loop={animations[currentAnimation].loop}
