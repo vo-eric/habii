@@ -15,8 +15,6 @@ import CreatureDisplay from '@/components/CreatureDisplay';
 export default function Home() {
   const { user, userProfile, loading } = useAuth();
 
-  console.log('Home page render:', { user: !!user, userProfile: !!userProfile, loading });
-
   // Temporarily bypass loading state for debugging
   if (loading) {
     console.log('Auth is loading, but showing content anyway for debugging');
@@ -69,16 +67,8 @@ export default function Home() {
   }
 
   return (
-    <main className='flex min-h-screen flex-col items-center justify-between py-12 px-6'>
-      <VStack spacing={6} w='full'>
-        <VStack spacing={2} textAlign='center'>
-          <Heading size='lg'>
-            Welcome back, {userProfile?.displayName || user.email}!
-          </Heading>
-          <Text color='gray.600'>Time to check on your creature</Text>
-        </VStack>
-        <CreatureDisplay />
-      </VStack>
+    <main className='flex min-h-screen flex-col items-center justify-between'>
+      <CreatureDisplay />
     </main>
   );
 }

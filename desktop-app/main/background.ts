@@ -177,7 +177,9 @@ function createWindow() {
       allowRunningInsecureContent: true, // Allow mixed content for auth
     },
     icon: join(__dirname, '../renderer/public/favicon.ico'),
-    titleBarStyle: 'default',
+    titleBarStyle: 'hidden', // Hide the title bar
+    frame: false, // Remove the window frame completely
+    fullscreen: true, // Start in fullscreen mode
     show: false, // Don't show until ready
   });
 

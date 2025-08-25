@@ -32,10 +32,10 @@ class ContextErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Habii</h1>
-            <p className="text-gray-600">Loading your digital companion...</p>
+        <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+          <div className='text-center'>
+            <h1 className='text-2xl font-bold text-gray-900 mb-4'>Habii</h1>
+            <p className='text-gray-600'>Loading your digital companion...</p>
           </div>
         </div>
       );
@@ -52,10 +52,7 @@ export const ClientProviders: React.FC<ClientProvidersProps> = ({
     <ChakraProvider theme={theme}>
       <ContextErrorBoundary>
         <AuthProvider>
-          <WebSocketProvider>
-            <Navigation />
-            {children}
-          </WebSocketProvider>
+          <WebSocketProvider>{children}</WebSocketProvider>
         </AuthProvider>
       </ContextErrorBoundary>
     </ChakraProvider>

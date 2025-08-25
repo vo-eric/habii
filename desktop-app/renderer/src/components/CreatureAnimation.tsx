@@ -5,11 +5,20 @@ import Lottie from 'lottie-react';
 import dogWalking from '~/public/dogWalking.json';
 import dogEating from '~/public/dogEating.json';
 import dogPlaying from '~/public/dogPlaying.json';
+import dogPooping from '~/public/dogPooping.json';
+import dogPetting from '~/public/dogPetting.json';
+import dogSleeping from '~/public/dogSleeping.json';
 import type { Creature } from '@/lib/database/client';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
 import type { AnimationEvent } from '@/lib/websocket';
 
-type AnimationType = 'walking' | 'eating' | 'playing' | 'resting';
+type AnimationType =
+  | 'walking'
+  | 'eating'
+  | 'playing'
+  | 'resting'
+  | 'pooping'
+  | 'petting';
 
 interface AnimationConfig {
   data: unknown;
@@ -62,10 +71,20 @@ export default function CreatureAnimation({
         loop: false,
         duration: calculateLottieDuration(dogPlaying),
       },
-      resting: {
-        data: dogEating, // You might want a separate resting animation
+      pooping: {
+        data: dogPooping,
         loop: false,
-        duration: calculateLottieDuration(dogEating),
+        duration: calculateLottieDuration(dogPooping),
+      },
+      petting: {
+        data: dogPetting,
+        loop: false,
+        duration: calculateLottieDuration(dogPetting),
+      },
+      resting: {
+        data: dogSleeping,
+        loop: false,
+        duration: calculateLottieDuration(dogSleeping),
       },
     }),
     []
@@ -142,6 +161,8 @@ export default function CreatureAnimation({
         feed: 'eating',
         play: 'playing',
         rest: 'resting',
+        poop: 'pooping',
+        pet: 'petting',
       };
 
       const animationType = animationTypeMap[event.type];

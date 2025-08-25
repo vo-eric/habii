@@ -4,7 +4,7 @@
  */
 
 export interface AnimationEvent {
-  type: 'feed' | 'play' | 'rest';
+  type: 'feed' | 'play' | 'rest' | 'poop' | 'pet';
   creatureId: string;
   userId: string;
   userName?: string;
