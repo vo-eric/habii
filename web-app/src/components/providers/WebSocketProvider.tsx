@@ -24,7 +24,7 @@ interface WebSocketContextType {
   joinCreatureRoom: (creatureId: string) => Promise<void>;
   leaveCreatureRoom: (creatureId: string) => void;
   triggerAnimation: (
-    type: 'feed' | 'play' | 'rest',
+    type: 'feed' | 'play' | 'rest' | 'poop' | 'pet',
     creatureId: string
   ) => Promise<void>;
   onAnimationSync: (callback: (event: AnimationEvent) => void) => () => void;
@@ -228,7 +228,10 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Trigger animation
   const triggerAnimation = useCallback(
-    async (type: 'feed' | 'play' | 'rest', creatureId: string) => {
+    async (
+      type: 'feed' | 'play' | 'rest' | 'pet' | 'poop',
+      creatureId: string
+    ) => {
       if (!socket?.connected) {
         throw new Error('WebSocket not connected');
       }
