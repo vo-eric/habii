@@ -13,7 +13,7 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import CreatureDisplay from '@/components/CreatureDisplay';
 
 export default function Home() {
-  const { user, userProfile, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -66,11 +66,6 @@ export default function Home() {
   return (
     <main className='flex min-h-screen flex-col items-center justify-between py-12 px-6'>
       <VStack spacing={6} w='full'>
-        <VStack spacing={2} textAlign='center'>
-          <Heading size='lg'>
-            Welcome back, {userProfile?.displayName || user.email}!
-          </Heading>
-        </VStack>
         <CreatureDisplay />
       </VStack>
     </main>

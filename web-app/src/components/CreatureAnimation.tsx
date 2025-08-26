@@ -250,19 +250,6 @@ export default function CreatureAnimation({
           className='h-[250px] w-auto mx-auto'
         />
       </div>
-
-      {/* Development debug info only */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className='absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded'>
-          {currentAnimation} {isPlayingTemporaryAnimation && '(temp)'}{' '}
-          {isTransitioning && '(transitioning)'}
-          {animations[currentAnimation].duration && (
-            <span className='ml-1'>
-              ({Math.round(animations[currentAnimation].duration! / 1000)}s)
-            </span>
-          )}
-        </div>
-      )}
     </div>
   );
 }

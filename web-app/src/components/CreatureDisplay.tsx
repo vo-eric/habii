@@ -27,10 +27,6 @@ export default function CreatureDisplay() {
       <div className='w-full max-w-md mx-auto bg-white rounded-lg shadow-md text-black relative'>
         {creature && (
           <>
-            <h3 className='text-sm font-bold text-gray-800 mb-1 text-center pt-4'>
-              {creature.name}
-            </h3>
-
             <div className='z-10'>
               <CreatureAnimation creature={creature} />
             </div>
