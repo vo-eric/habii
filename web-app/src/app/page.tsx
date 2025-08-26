@@ -70,7 +70,6 @@ export default function Home() {
           <Heading size='lg'>
             Welcome back, {userProfile?.displayName || user.email}!
           </Heading>
-          <Text color='gray.600'>Time to check on your creature</Text>
         </VStack>
         <CreatureDisplay />
       </VStack>

@@ -35,11 +35,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const createPreAuthUser = () => {
     // Use Eric Vo's real Firebase UID to fetch actual creature data
     const preAuthUser = {
-      uid: '6wbqAvVg9VaVBC5Ywgyolv2hi5M2', // Eric Vo's real Firebase UID
-      email: 'allamasaid@gmail.com',
-      displayName: 'Eric Vo',
+      uid: 'ycwCRoZ1EmWhX57i4LR04BQj7zj2', // Eric Vo's real Firebase UID
+      email: 'test@test.com',
+      displayName: 'Fractal',
       photoURL:
-        'https://lh3.googleusercontent.com/a/ACg8ocLg0UF62Th6EEyczPoc7bhwB7X-mLL7Sd7Ey_ck3wil6NzC2w=s96-c',
+        'https://fractalbootcamp.com/_next/image?url=https%3A%2F%2Fassets.super.so%2F1b3251df-5f3c-43e2-bd84-3fd1dbec182d%2Fuploads%2Flogo%2F825f812c-c0ae-488c-8664-d1e93aee9593.png&w=256&q=90',
     } as User;
 
     const preAuthProfile: UserProfile = {
