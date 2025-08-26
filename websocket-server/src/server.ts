@@ -38,6 +38,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
   'https://habii-235d1.firebaseapp.com',
   // Add your Vercel domain here
   'https://habii-web-app.vercel.app',
+  'https://habii.life',
   // Add your custom domain here if you have one
   // 'https://yourdomain.com'
 ];
@@ -107,8 +108,8 @@ io.use(async (socket: TypedSocket, next) => {
     ) {
       console.log('Desktop app detected - accepting development token');
       socket.data.user = {
-        uid: '6wbqAvVg9VaVBC5Ywgyolv2hi5M2', // Eric Vo's UID
-        email: 'allamasaid@gmail.com',
+        uid: 'ycwCRoZ1EmWhX57i4LR04BQj7zj2', // Eric Vo's UID
+        email: 'test@test.com',
       };
       return next();
     }

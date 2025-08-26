@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
     // Use your production WebSocket server for shared connections
     NEXT_PUBLIC_WEBSOCKET_URL:
       process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'https://habii.onrender.com',
-    NEXT_PUBLIC_APP_URL: 'https://habii-web-app.vercel.app/',
+    NEXT_PUBLIC_APP_URL: 'https://habii.life',
     // Firebase Configuration - Load from environment variables only
     NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:
