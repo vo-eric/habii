@@ -76,7 +76,6 @@ class GPIOService {
         }
     }
     setupPythonBridge() {
-        console.log('GPIO Service: Setting up Python GPIO bridge...');
         const fs = require('fs');
         const commFile = '/tmp/gpio_button_events.json';
         // Watch for button events from Python script
@@ -89,39 +88,27 @@ class GPIOService {
                     const currentFileModTime = stats.mtime.getTime();
                     // Only process if file was modified since last check
                     if (currentFileModTime > lastFileModTime) {
-                        console.log('GPIO Service: Detected file change, reading event...');
                         const fileContent = fs.readFileSync(commFile, 'utf8');
                         const eventData = JSON.parse(fileContent);
-                        console.log('GPIO Service: Parsed event data:', eventData);
                         // Process if this is a new event
                         if (eventData.button &&
                             eventData.timestamp &&
                             eventData.timestamp > lastProcessedTimestamp) {
-                            console.log(`GPIO Service: Processing button event: ${eventData.button}`);
                             this.sendButtonEvent(eventData.button);
                             lastProcessedTimestamp = eventData.timestamp;
-                        }
-                        else {
-                            console.log('GPIO Service: Event already processed or invalid');
                         }
                         lastFileModTime = currentFileModTime;
                     }
                 }
-                else {
-                    console.log('GPIO Service: Communication file does not exist yet');
-                }
             }
             catch (error) {
-                console.error('GPIO Service: Error checking for events:', error);
+                // Ignore errors, file might not exist or be malformed
             }
             // Check again in 100ms
             setTimeout(checkForEvents, 100);
         };
         // Start monitoring
         checkForEvents();
-        console.log('GPIO Service: Python bridge monitoring started');
-        console.log('GPIO Service: Monitoring file:', commFile);
-        console.log('GPIO Service: Make sure to run: sudo python3 /home/pi/gpio_buttons.py');
     }
     setupKeyboardSimulation() {
         console.log('GPIO Service: Setting up keyboard simulation for testing...');

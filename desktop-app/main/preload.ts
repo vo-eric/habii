@@ -12,19 +12,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Add any IPC methods you might need later
   getVersion: () => process.versions.electron,
   getPlatform: () => process.platform,
-  
+
   // GPIO button events
   onButtonPressed: (callback: (event: ButtonEvent) => void) => {
-    console.log('Preload: Setting up button-pressed listener');
     ipcRenderer.on('button-pressed', (_, data: ButtonEvent) => {
-      console.log('Preload: Received button-pressed event:', data);
       callback(data);
     });
   },
-  
+
   // Remove button event listener
   removeButtonListener: () => {
-    console.log('Preload: Removing button listeners');
     ipcRenderer.removeAllListeners('button-pressed');
-  }
+  },
 });

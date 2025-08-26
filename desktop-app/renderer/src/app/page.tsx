@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Container,
@@ -11,21 +11,6 @@ import {
 } from '@chakra-ui/react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import CreatureDisplay from '@/components/CreatureDisplay';
-
-interface ButtonEvent {
-  button: string;
-  timestamp: number;
-}
-
-// Declare the electronAPI interface for TypeScript
-declare global {
-  interface Window {
-    electronAPI?: {
-      onButtonPressed: (callback: (event: ButtonEvent) => void) => void;
-      removeButtonListener: () => void;
-    };
-  }
-}
 
 export default function Home() {
   const { user, userProfile, loading } = useAuth();

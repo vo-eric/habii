@@ -216,7 +216,7 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     console.log('Window ready to show');
     mainWindow.show();
-    
+
     // Initialize GPIO service after window is ready
     gpioService.setMainWindow(mainWindow);
     gpioService.initializeButtons();
@@ -291,7 +291,7 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
   // Clean up GPIO service
   gpioService.cleanup();
-  
+
   // Clean up Next.js process
   if (nextjsProcess) {
     console.log('Cleaning up Next.js process before quit...');
