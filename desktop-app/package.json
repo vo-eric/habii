@@ -21,7 +21,8 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
-    "next": "15.4.6"
+    "next": "15.4.6",
+    "onoff": "^6.0.3"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

@@ -7,6 +7,7 @@ const fs_1 = require("fs");
 const http_1 = require("http");
 const promises_1 = require("fs/promises");
 const path_2 = require("path");
+const gpio_service_1 = require("./gpio-service");
 // Next.js process for renderer (only used in development)
 let nextjsProcess = null;
 let staticServer = null;
@@ -179,6 +180,9 @@ function createWindow() {
     mainWindow.once('ready-to-show', () => {
         console.log('Window ready to show');
         mainWindow.show();
+        // Initialize GPIO service after window is ready
+        gpio_service_1.gpioService.setMainWindow(mainWindow);
+        gpio_service_1.gpioService.initializeButtons();
     });
     // Add error handling for page load
     mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
@@ -235,6 +239,8 @@ electron_1.app.on('window-all-closed', () => {
     }
 });
 electron_1.app.on('before-quit', () => {
+    // Clean up GPIO service
+    gpio_service_1.gpioService.cleanup();
     // Clean up Next.js process
     if (nextjsProcess) {
         console.log('Cleaning up Next.js process before quit...');
