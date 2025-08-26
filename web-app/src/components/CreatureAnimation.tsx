@@ -240,7 +240,7 @@ export default function CreatureAnimation({
         }`}
       >
         <div
-          className='absolute border-4 border-indigo-600 size-10 z-1 bg-amber-400'
+          className='absolute border-4 border-indigo-600 h-full w-full z-1 bg-transparent'
           onClick={handleCreatureClick}
         />
 
