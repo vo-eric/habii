@@ -103,13 +103,11 @@ export default function CreatureAnimation({
     switch (true) {
       case creature && creature.hunger >= 80:
         if (connected && creature) {
-          // Send animation to server (sync will handle local play)
           triggerAnimation('poop', creature.id).catch(console.error);
         }
         break;
       default:
         if (creature) {
-          // Send animation to server (sync will handle local play)
           triggerAnimation('pet', creature.id).catch(console.error);
         }
         break;
@@ -118,12 +116,7 @@ export default function CreatureAnimation({
 
   const displayAnimation = useCallback(
     (animationType: AnimationType) => {
-      console.log(`🎬 displayAnimation called with: ${animationType}`);
-
       if (isPlayingTemporaryAnimation || isTransitioning) {
-        console.log(
-          `❌ Animation blocked - already playing: ${isPlayingTemporaryAnimation}, transitioning: ${isTransitioning}`
-        );
         return;
       }
 
@@ -157,32 +150,27 @@ export default function CreatureAnimation({
         setIsTransitioning(false);
       };
 
-      // Start the sequence
       setIsTransitioning(true);
       timeoutRef.current = setTimeout(showAnimation, TRANSITION_DURATION);
     },
     [animations, isPlayingTemporaryAnimation, isTransitioning]
   );
 
-  // Join creature room when creature is loaded
   useEffect(() => {
     if (creature && connected) {
       joinCreatureRoom(creature.id).catch(console.error);
     }
   }, [creature, connected, joinCreatureRoom]);
 
-  // WebSocket animation sync
   useEffect(() => {
     if (!creature) return;
 
     const unsubscribe = onAnimationSync((event: AnimationEvent) => {
-      // Only handle events for our creature
       if (event.creatureId !== creature.id) return;
 
       const now = Date.now();
       const delay = event.timestamp - now;
 
-      // Map event types to animation types
       const animationTypeMap: Record<string, AnimationType> = {
         feed: 'eating',
         play: 'playing',
@@ -194,13 +182,11 @@ export default function CreatureAnimation({
       const animationType = animationTypeMap[event.type];
       if (!animationType) return;
 
-      // Clear any existing scheduled animation
       if (scheduledTimeoutRef.current) {
         clearTimeout(scheduledTimeoutRef.current);
         scheduledTimeoutRef.current = null;
       }
 
-      // Schedule the animation (immediate if time has passed)
       const actualDelay = Math.max(0, delay);
       scheduledTimeoutRef.current = setTimeout(() => {
         displayAnimation(animationType);
@@ -216,7 +202,6 @@ export default function CreatureAnimation({
     };
   }, [creature, onAnimationSync, triggerAnimation, displayAnimation]);
 
-  // Cleanup
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
