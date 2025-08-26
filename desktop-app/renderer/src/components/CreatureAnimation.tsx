@@ -42,10 +42,8 @@ const calculateLottieDuration = (lottieData: unknown): number => {
 
 export default function CreatureAnimation({
   creature,
-  buttonColor = 'bg-amber-400',
 }: {
   creature: Creature | null;
-  buttonColor?: string;
 }) {
   const [currentAnimation, setCurrentAnimation] =
     useState<AnimationType>('walking');
@@ -242,7 +240,7 @@ export default function CreatureAnimation({
         }`}
       >
         <div
-          className={`absolute border-4 border-indigo-600 size-10 z-1 ${buttonColor} transition-colors duration-300`}
+          className={`absolute border-4 border-indigo-600 size-10 z-1 bg-amber-400 transition-colors duration-300`}
           onClick={handleCreatureClick}
         />
         <Lottie
