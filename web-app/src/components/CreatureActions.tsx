@@ -3,11 +3,7 @@
 import { useState } from 'react';
 import { useCreature } from '@/lib/database/hooks/useCreature';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
-import {
-  Bed20Regular,
-  FoodChickenLeg20Regular,
-  SportSoccer20Regular,
-} from '@fluentui/react-icons';
+import { GiChickenLeg, GiSoccerBall, GiBed } from 'react-icons/gi';
 
 interface CreatureActionsProps {
   loading?: boolean;
@@ -99,7 +95,7 @@ export default function CreatureActions({
           disabled={loading || actionLoading === 'feed'}
           className='absolute inset-0 flex items-center justify-center rounded-full hover:bg-red-50 disabled:opacity-50'
         >
-          <FoodChickenLeg20Regular className='size-6' color='#90A0BA' />
+          <GiChickenLeg className='size-6' style={{ color: '#90A0BA' }} />
         </button>
       </div>
 
@@ -130,7 +126,7 @@ export default function CreatureActions({
           disabled={loading || actionLoading === 'play'}
           className='absolute inset-0 flex items-center justify-center rounded-full hover:bg-amber-50 disabled:opacity-50'
         >
-          <SportSoccer20Regular className='size-6' color='#90A0BA' />
+          <GiSoccerBall className='size-6' style={{ color: '#90A0BA' }} />
         </button>
       </div>
 
@@ -161,7 +157,7 @@ export default function CreatureActions({
           disabled={loading || actionLoading === 'rest'}
           className='absolute inset-0 flex items-center justify-center rounded-full hover:bg-purple-50 disabled:opacity-50'
         >
-          <Bed20Regular className='size-6' color='#90A0BA' />
+          <GiBed className='size-6' style={{ color: '#90A0BA' }} />
         </button>
       </div>
     </div>

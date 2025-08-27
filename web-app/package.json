@@ -16,7 +16,6 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
-    "@fluentui/react-icons": "^2.0.308",
     "@hookform/resolvers": "^5.2.1",
     "firebase": "^12.1.0",
     "firebase-admin": "^13.4.0",
