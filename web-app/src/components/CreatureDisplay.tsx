@@ -24,7 +24,7 @@ export default function CreatureDisplay() {
   return (
     <>
       <div
-        className='w-full h-[500px] max-w-md mx-auto bg-white rounded-lg shadow-md text-black relative overflow-hidden'
+        className='w-full h-[500px] max-w-md mx-auto bg-white rounded-lg shadow-md text-black relative overflow-hidden cursor-pointer'
         style={{
           backgroundImage: 'url(/living_room.png)',
           backgroundSize: 'cover',

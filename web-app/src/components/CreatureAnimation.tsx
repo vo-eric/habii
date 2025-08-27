@@ -104,11 +104,7 @@ export default function CreatureAnimation({
   );
 
   const handleCreatureClick = () => {
-    const random = Math.random();
-
-    if (random >= 0.5) {
-      broadcastRandomAnimation();
-    }
+    broadcastRandomAnimation();
   };
 
   const broadcastRandomAnimation = () => {
