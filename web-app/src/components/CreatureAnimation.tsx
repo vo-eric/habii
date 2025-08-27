@@ -151,8 +151,10 @@ export default function CreatureAnimation({
         setCurrentMedia(mediaConfig || null);
         setIsTransitioning(false);
 
-        // Play sound for the animation
-        playSound(animationType);
+        // Play sound for the animation (only if it's a supported sound type)
+        if (animationType !== 'walking' && animationType !== 'media') {
+          playSound(animationType);
+        }
 
         if (config.duration) {
           timeoutRef.current = setTimeout(
@@ -173,14 +175,12 @@ export default function CreatureAnimation({
         setIsPlayingTemporaryAnimation(false);
         setIsTransitioning(false);
 
-        // Stop any non-looping sounds and start walking sound
+        // Stop any non-looping sounds
         stopSound('eating');
         stopSound('playing');
         stopSound('pooping');
         stopSound('petting');
         stopSound('resting');
-        stopSound('media');
-        playSound('walking');
       };
 
       setIsTransitioning(true);
