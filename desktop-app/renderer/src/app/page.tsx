@@ -34,10 +34,12 @@ export default function Home() {
     console.log('No user, showing welcome screen');
     return (
       <Box
-        minH='calc(100vh - 80px)'
+        h='100vh'
+        w='100vw'
         display='flex'
         alignItems='center'
         justifyContent='center'
+        overflow='hidden'
       >
         <Container maxW='container.md' textAlign='center'>
           <VStack spacing={8}>
@@ -67,7 +69,7 @@ export default function Home() {
   }
 
   return (
-    <main className='flex min-h-screen flex-col items-center justify-between'>
+    <main className='flex h-screen w-screen flex-col items-center justify-center overflow-hidden'>
       <CreatureDisplay />
     </main>
   );

@@ -2,8 +2,9 @@
 
 import { useCreature } from '@/lib/database/hooks/useCreature';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import CreatureAnimation from './CreatureAnimation';
+import CreatureActions from './CreatureActions';
 
 interface ButtonEvent {
   button: string;
@@ -22,13 +23,40 @@ declare global {
 export default function CreatureDisplay() {
   const { creature, feedCreature, playWithCreature, restCreature } =
     useCreature();
-  const { triggerAnimation } = useWebSocket();
+  const { triggerAnimation, connected } = useWebSocket();
+  const [displayMedia, setDisplayMedia] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.electronAPI) {
       window.electronAPI.onButtonPressed(async (event: ButtonEvent) => {
         switch (event.button) {
           case 'button1':
+            // Display media for 3 seconds
+            setDisplayMedia(true);
+
+            // Broadcast media event via WebSocket
+            if (connected && creature) {
+              try {
+                await triggerAnimation('media', creature.id, {
+                  mediaConfig: {
+                    type: 'image',
+                    src: '/wee_baby_kona.jpg',
+                    duration: 3000,
+                  },
+                });
+              } catch (wsError) {
+                console.error(
+                  'Failed to trigger WebSocket media event:',
+                  wsError
+                );
+              }
+            }
+
+            setTimeout(() => {
+              setDisplayMedia(false);
+            }, 3000);
+            break;
+          case 'button4':
             try {
               await feedCreature();
 
@@ -46,7 +74,7 @@ export default function CreatureDisplay() {
               console.error('Error calling feedCreature:', error);
             }
             break;
-          case 'button2':
+          case 'button3':
             try {
               await playWithCreature();
 
@@ -64,7 +92,7 @@ export default function CreatureDisplay() {
               console.error('Error calling playWithCreature:', error);
             }
             break;
-          case 'button3':
+          case 'button2':
             try {
               await restCreature();
 
@@ -82,10 +110,6 @@ export default function CreatureDisplay() {
               console.error('Error calling restCreature:', error);
             }
             break;
-          case 'button4':
-            console.log('button4');
-            // No action assigned yet
-            break;
         }
       });
 
@@ -96,16 +120,22 @@ export default function CreatureDisplay() {
         }
       };
     }
-  }, [creature]);
+  }, [creature, connected, triggerAnimation]);
 
   return (
     <div
-      className={`h-full w-full mx-auto rounded-lg shadow-md text-black relative`}
+      className={`h-full w-full mx-auto text-black relative overflow-hidden`}
     >
       {creature && (
         <>
           <div className='absolute z-10 top-0'>
-            <CreatureAnimation creature={creature} />
+            <CreatureAnimation
+              creature={creature}
+              displayMedia={displayMedia}
+            />
+          </div>
+          <div className='absolute right-0 top-1/2 -translate-y-1/2 h-full z-100'>
+            <CreatureActions />
           </div>
         </>
       )}

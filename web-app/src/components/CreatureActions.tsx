@@ -1,9 +1,13 @@
 'use client';
 
-import { Button } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useCreature } from '@/lib/database/hooks/useCreature';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
+import {
+  Sleep20Regular,
+  FoodChickenLeg20Regular,
+  SportSoccer20Regular,
+} from '@fluentui/react-icons';
 
 interface CreatureActionsProps {
   loading?: boolean;
@@ -57,34 +61,28 @@ export default function CreatureActions({
   }
 
   return (
-    <div className='space-y-2'>
-      <Button
+    <div className='flex flex-col gap-2 justify-evenly h-full pr-4'>
+      <button
         onClick={() => handleAction('feed')}
         disabled={loading || actionLoading === 'feed'}
-        colorScheme='green'
-        size='sm'
-        className='w-full'
+        className='rounded-full size-10 border-2'
       >
-        {actionLoading === 'feed' ? 'Feeding...' : 'Feed'}
-      </Button>
-      <Button
+        <FoodChickenLeg20Regular className='size-10' color='#90A0BA' />
+      </button>
+      <button
         onClick={() => handleAction('play')}
         disabled={loading || actionLoading === 'play'}
-        colorScheme='blue'
-        size='sm'
-        className='w-full'
+        className='rounded-full size-10 border-2'
       >
-        {actionLoading === 'play' ? 'Playing...' : 'Play'}
-      </Button>
-      <Button
+        <SportSoccer20Regular className='size-10' color='#90A0BA' />
+      </button>
+      <button
         onClick={() => handleAction('rest')}
         disabled={loading || actionLoading === 'rest'}
-        colorScheme='purple'
-        size='sm'
-        className='w-full'
+        className='rounded-full size-10 border-2'
       >
-        {actionLoading === 'rest' ? 'Sleeping...' : 'Sleep'}
-      </Button>
+        <Sleep20Regular className='size-10' color='#90A0BA' />
+      </button>
     </div>
   );
 }

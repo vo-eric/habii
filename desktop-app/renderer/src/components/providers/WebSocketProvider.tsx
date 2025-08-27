@@ -24,8 +24,15 @@ interface WebSocketContextType {
   joinCreatureRoom: (creatureId: string) => Promise<void>;
   leaveCreatureRoom: (creatureId: string) => void;
   triggerAnimation: (
-    type: 'feed' | 'play' | 'rest' | 'poop' | 'pet',
-    creatureId: string
+    type: 'feed' | 'play' | 'rest' | 'poop' | 'pet' | 'media',
+    creatureId: string,
+    options?: {
+      mediaConfig?: {
+        type: 'image' | 'video';
+        src: string;
+        duration: number;
+      };
+    }
   ) => Promise<void>;
   onAnimationSync: (callback: (event: AnimationEvent) => void) => () => void;
 }
@@ -231,8 +238,15 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   // Broadcast animation event to server for cross-platform sync
   const broadcastAnimation = useCallback(
     async (
-      type: 'feed' | 'play' | 'rest' | 'poop' | 'pet',
-      creatureId: string
+      type: 'feed' | 'play' | 'rest' | 'poop' | 'pet' | 'media',
+      creatureId: string,
+      options?: {
+        mediaConfig?: {
+          type: 'image' | 'video';
+          src: string;
+          duration: number;
+        };
+      }
     ) => {
       if (!socket?.connected) {
         throw new Error('WebSocket not connected');
@@ -248,6 +262,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           {
             type,
             creatureId,
+            ...options,
           },
           (response) => {
             if (response?.success) {
