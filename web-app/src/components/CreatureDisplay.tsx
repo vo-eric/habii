@@ -23,10 +23,18 @@ export default function CreatureDisplay() {
 
   return (
     <>
-      <div className='w-full max-w-md mx-auto bg-white rounded-lg shadow-md text-black relative'>
+      <div
+        className='w-full h-[500px] max-w-md mx-auto bg-white rounded-lg shadow-md text-black relative overflow-hidden'
+        style={{
+          backgroundImage: 'url(/living_room.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
         {creature && (
           <>
-            <div className='z-10'>
+            <div className='z-10 h-[250px] bottom-0 absolute left-1/2 -translate-x-1/2'>
               <CreatureAnimation creature={creature} />
             </div>
 
