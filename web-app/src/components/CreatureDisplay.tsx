@@ -7,7 +7,6 @@ import CreatureAnimation from './CreatureAnimation';
 
 export default function CreatureDisplay() {
   const [loading, setLoading] = useState(false);
-
   const { creature, createCreature } = useCreature();
 
   const handleCreateCreature = async () => {
@@ -31,7 +30,7 @@ export default function CreatureDisplay() {
               <CreatureAnimation creature={creature} />
             </div>
 
-            <div className='absolute right-0 top-1/2 -translate-y-1/2 h-full'>
+            <div className='absolute right-0 top-1/2 -translate-y-1/2 h-full z-100'>
               <CreatureActions />
             </div>
           </>

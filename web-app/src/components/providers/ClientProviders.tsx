@@ -18,7 +18,7 @@ export const ClientProviders: React.FC<ClientProvidersProps> = ({
     <ChakraProvider theme={theme}>
       <AuthProvider>
         <WebSocketProvider>
-          <Navigation />
+          {/* <Navigation /> */}
           {children}
         </WebSocketProvider>
       </AuthProvider>
