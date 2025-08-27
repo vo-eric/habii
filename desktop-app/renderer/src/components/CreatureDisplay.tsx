@@ -125,6 +125,12 @@ export default function CreatureDisplay() {
   return (
     <div
       className={`h-full w-full mx-auto text-black relative overflow-hidden`}
+      style={{
+        backgroundImage: 'url(/living_room.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
     >
       {creature && (
         <>

@@ -67,7 +67,7 @@ export default function CreatureActions({
   const tirednessStrokeDasharray = (tirednessFill / 100) * circumference;
 
   return (
-    <div className='flex flex-col gap-4 justify-evenly h-full pr-4'>
+    <div className='flex flex-col gap-4 pt-10 pr-4'>
       <div className='relative'>
         <svg className='w-12 h-12 transform -rotate-90' viewBox='0 0 40 40'>
           <circle
@@ -95,7 +95,7 @@ export default function CreatureActions({
           disabled={loading || actionLoading === 'feed'}
           className='absolute inset-0 flex items-center justify-center rounded-full hover:bg-red-50 disabled:opacity-50'
         >
-          <GiChickenLeg className='size-6' style={{ color: '#90A0BA' }} />
+          <GiChickenLeg className='size-6' style={{ color: '#ef4444' }} />
         </button>
       </div>
 
@@ -113,7 +113,7 @@ export default function CreatureActions({
             cx='20'
             cy='20'
             r='18'
-            stroke='#fbbf24'
+            stroke='#000099'
             strokeWidth='2'
             fill='none'
             strokeDasharray={circumference}
@@ -126,7 +126,7 @@ export default function CreatureActions({
           disabled={loading || actionLoading === 'play'}
           className='absolute inset-0 flex items-center justify-center rounded-full hover:bg-amber-50 disabled:opacity-50'
         >
-          <GiSoccerBall className='size-6' style={{ color: '#90A0BA' }} />
+          <GiSoccerBall className='size-6' style={{ color: '#000099' }} />
         </button>
       </div>
 
@@ -144,7 +144,7 @@ export default function CreatureActions({
             cx='20'
             cy='20'
             r='18'
-            stroke='#8b5cf6'
+            stroke='#ff6600'
             strokeWidth='2'
             fill='none'
             strokeDasharray={circumference}
@@ -157,7 +157,7 @@ export default function CreatureActions({
           disabled={loading || actionLoading === 'rest'}
           className='absolute inset-0 flex items-center justify-center rounded-full hover:bg-purple-50 disabled:opacity-50'
         >
-          <GiBed className='size-6' style={{ color: '#90A0BA' }} />
+          <GiBed className='size-6' style={{ color: '#ff6600' }} />
         </button>
       </div>
     </div>
