@@ -18,7 +18,8 @@ type AnimationType =
   | 'playing'
   | 'resting'
   | 'pooping'
-  | 'petting';
+  | 'petting'
+  | 'media';
 
 interface AnimationConfig {
   data: unknown;
@@ -26,7 +27,14 @@ interface AnimationConfig {
   duration?: number;
 }
 
+interface MediaConfig {
+  type: 'image' | 'video';
+  src: string;
+  duration: number;
+}
+
 const TRANSITION_DURATION = 200;
+const MEDIA_DISPLAY_DURATION = 3000; // 3 seconds
 
 const calculateLottieDuration = (lottieData: unknown): number => {
   const data = lottieData as { op: number; fr: number };
@@ -42,14 +50,17 @@ const calculateLottieDuration = (lottieData: unknown): number => {
 
 export default function CreatureAnimation({
   creature,
+  displayMedia,
 }: {
   creature: Creature | null;
+  displayMedia?: boolean;
 }) {
   const [currentAnimation, setCurrentAnimation] =
     useState<AnimationType>('walking');
   const [isPlayingTemporaryAnimation, setIsPlayingTemporaryAnimation] =
     useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentMedia, setCurrentMedia] = useState<MediaConfig | null>(null);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scheduledTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -87,9 +98,19 @@ export default function CreatureAnimation({
         loop: false,
         duration: calculateLottieDuration(dogSleeping),
       },
+      media: {
+        data: dogWalking, // Fallback data for media type
+        loop: false,
+      },
     }),
     []
   );
+
+  const mediaConfig: MediaConfig = {
+    type: 'image',
+    src: '/wee-baby-kona.jpg',
+    duration: MEDIA_DISPLAY_DURATION,
+  };
 
   const handleCreatureClick = () => {
     const random = Math.random();
@@ -156,6 +177,44 @@ export default function CreatureAnimation({
     [animations, isPlayingTemporaryAnimation, isTransitioning]
   );
 
+  const showMediaContent = useCallback(() => {
+    if (isPlayingTemporaryAnimation || isTransitioning) {
+      return;
+    }
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    const showMedia = () => {
+      setIsPlayingTemporaryAnimation(true);
+      setCurrentAnimation('media');
+      setCurrentMedia(mediaConfig);
+      setIsTransitioning(false);
+
+      // Set timeout to return to walking animation
+      timeoutRef.current = setTimeout(
+        startReturnTransition,
+        mediaConfig.duration
+      );
+    };
+
+    const startReturnTransition = () => {
+      setIsTransitioning(true);
+      timeoutRef.current = setTimeout(returnToWalking, TRANSITION_DURATION);
+    };
+
+    const returnToWalking = () => {
+      setCurrentAnimation('walking');
+      setCurrentMedia(null);
+      setIsPlayingTemporaryAnimation(false);
+      setIsTransitioning(false);
+    };
+
+    setIsTransitioning(true);
+    timeoutRef.current = setTimeout(showMedia, TRANSITION_DURATION);
+  }, [isPlayingTemporaryAnimation, isTransitioning, mediaConfig]);
+
   useEffect(() => {
     if (creature && connected) {
       joinCreatureRoom(creature.id).catch(console.error);
@@ -202,6 +261,13 @@ export default function CreatureAnimation({
     };
   }, [creature, onAnimationSync, displayAnimation]);
 
+  // Trigger media display when displayMedia prop becomes true
+  useEffect(() => {
+    if (displayMedia) {
+      showMediaContent();
+    }
+  }, [displayMedia, showMediaContent]);
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -228,11 +294,47 @@ export default function CreatureAnimation({
           className={`absolute border-4 border-indigo-600 h-full w-full z-1 bg-transparent`}
           onClick={handleCreatureClick}
         />
-        <Lottie
-          animationData={animations[currentAnimation].data}
-          loop={animations[currentAnimation].loop}
-          className='h-[250px] w-auto mx-auto'
-        />
+
+        {currentAnimation === 'media' && currentMedia ? (
+          <div className='h-[250px] w-auto mx-auto flex items-center justify-center'>
+            {currentMedia.type === 'image' ? (
+              <img
+                src={currentMedia.src}
+                alt='Special content'
+                className='h-full w-auto object-contain'
+                onError={(e) => {
+                  console.error('Failed to load image:', currentMedia.src);
+                  // Fallback to walking animation if image fails to load
+                  setCurrentAnimation('walking');
+                  setCurrentMedia(null);
+                  setIsPlayingTemporaryAnimation(false);
+                  setIsTransitioning(false);
+                }}
+              />
+            ) : (
+              <video
+                src={currentMedia.src}
+                className='h-full w-auto object-contain'
+                autoPlay
+                muted
+                onError={(e) => {
+                  console.error('Failed to load video:', currentMedia.src);
+                  // Fallback to walking animation if video fails to load
+                  setCurrentAnimation('walking');
+                  setCurrentMedia(null);
+                  setIsPlayingTemporaryAnimation(false);
+                  setIsTransitioning(false);
+                }}
+              />
+            )}
+          </div>
+        ) : (
+          <Lottie
+            animationData={animations[currentAnimation].data}
+            loop={animations[currentAnimation].loop}
+            className='h-[250px] w-auto mx-auto'
+          />
+        )}
       </div>
     </div>
   );

@@ -21,6 +21,7 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@fluentui/react-icons": "^2.0.308",
     "next": "15.4.6",
     "onoff": "^6.0.3"
   },

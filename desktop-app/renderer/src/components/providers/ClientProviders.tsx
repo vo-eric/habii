@@ -5,7 +5,6 @@ import { ChakraProvider } from '@chakra-ui/react';
 import theme from '@/styles/theme';
 import { AuthProvider } from './AuthProvider';
 import { WebSocketProvider } from './WebSocketProvider';
-import { Navigation } from '@/components/Navigation';
 
 interface ClientProvidersProps {
   children: React.ReactNode;
