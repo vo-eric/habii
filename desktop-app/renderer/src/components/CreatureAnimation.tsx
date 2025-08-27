@@ -11,6 +11,7 @@ import dogSleeping from '~/public/dogSleeping.json';
 import type { Creature } from '@/lib/database/client';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
 import type { AnimationEvent } from '@/lib/websocket';
+import { useSoundManager } from '@/lib/sound-manager';
 
 type AnimationType =
   | 'walking'
@@ -66,6 +67,7 @@ export default function CreatureAnimation({
   const scheduledTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { onAnimationSync, joinCreatureRoom, connected, triggerAnimation } =
     useWebSocket();
+  const { playSound, stopSound } = useSoundManager();
 
   const animations = useMemo<Record<AnimationType, AnimationConfig>>(
     () => ({
@@ -152,6 +154,11 @@ export default function CreatureAnimation({
         setCurrentAnimation(animationType);
         setIsTransitioning(false);
 
+        // Play sound for the animation (only for types that have sounds)
+        if (animationType !== 'walking' && animationType !== 'media') {
+          playSound(animationType);
+        }
+
         if (config.duration) {
           timeoutRef.current = setTimeout(
             startReturnTransition,
@@ -169,6 +176,13 @@ export default function CreatureAnimation({
         setCurrentAnimation('walking');
         setIsPlayingTemporaryAnimation(false);
         setIsTransitioning(false);
+
+        // Stop any non-looping sounds
+        stopSound('eating');
+        stopSound('playing');
+        stopSound('pooping');
+        stopSound('petting');
+        stopSound('resting');
       };
 
       setIsTransitioning(true);
@@ -192,6 +206,9 @@ export default function CreatureAnimation({
       setCurrentMedia(mediaConfig);
       setIsTransitioning(false);
 
+      // Play media sound (only if it exists in sound manager)
+      // playSound('media'); // Commented out - media sound not available
+
       // Set timeout to return to walking animation
       timeoutRef.current = setTimeout(
         startReturnTransition,
@@ -209,6 +226,10 @@ export default function CreatureAnimation({
       setCurrentMedia(null);
       setIsPlayingTemporaryAnimation(false);
       setIsTransitioning(false);
+
+      // Stop media sound and start walking sound
+      // stopSound('media'); // Commented out - media sound not available
+      // playSound('walking'); // Commented out - walking sound not available
     };
 
     setIsTransitioning(true);
@@ -220,6 +241,13 @@ export default function CreatureAnimation({
       joinCreatureRoom(creature.id).catch(console.error);
     }
   }, [creature, connected, joinCreatureRoom]);
+
+  // Start walking sound when component mounts
+  useEffect(() => {
+    if (creature) {
+      // playSound('walking'); // Commented out - walking sound not available
+    }
+  }, [creature, playSound]);
 
   useEffect(() => {
     if (!creature) return;
