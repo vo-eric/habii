@@ -70,7 +70,7 @@ export default function CreatureActions({
   const tirednessStrokeDasharray = (tirednessFill / 100) * circumference;
 
   return (
-    <div className='flex flex-col gap-4 justify-evenly h-full pr-4'>
+    <div className='flex flex-col gap-4 justify-evenly h-full pr-4 pt-4'>
       <div className='relative'>
         <svg className='w-12 h-12 transform -rotate-90' viewBox='0 0 40 40'>
           <circle

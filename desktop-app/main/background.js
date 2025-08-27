@@ -152,6 +152,8 @@ function createWindow() {
         frame: false, // Remove the window frame completely
         fullscreen: true, // Start in fullscreen mode
         show: false, // Don't show until ready
+        resizable: false, // Prevent resizing to avoid scrollbars
+        useContentSize: true, // Use content size instead of window size
     });
     // Handle new window requests (for auth popups)
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {

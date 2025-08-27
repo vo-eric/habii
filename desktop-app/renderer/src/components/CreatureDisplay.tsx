@@ -40,7 +40,7 @@ export default function CreatureDisplay() {
                 await triggerAnimation('media', creature.id, {
                   mediaConfig: {
                     type: 'image',
-                    src: '/wee-baby-kona.jpg',
+                    src: '/wee_baby_kona.jpg',
                     duration: 3000,
                   },
                 });
@@ -124,7 +124,7 @@ export default function CreatureDisplay() {
 
   return (
     <div
-      className={`h-full w-full mx-auto rounded-lg shadow-md text-black relative`}
+      className={`h-full w-full mx-auto text-black relative overflow-hidden`}
     >
       {creature && (
         <>

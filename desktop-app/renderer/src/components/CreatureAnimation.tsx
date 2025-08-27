@@ -108,7 +108,7 @@ export default function CreatureAnimation({
 
   const mediaConfig: MediaConfig = {
     type: 'image',
-    src: '/wee-baby-kona.jpg',
+    src: '/wee_baby_kona.jpg',
     duration: MEDIA_DISPLAY_DURATION,
   };
 
