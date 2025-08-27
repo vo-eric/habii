@@ -9,6 +9,8 @@ module.exports = {
     'http://localhost:3001',
     'https://habii-235d1.web.app',
     'https://habii-235d1.firebaseapp.com',
+    'https://habii-web-app.vercel.app',
+    'https://habii.life',
     // Add your custom domain here if you have one
     // 'https://yourdomain.com'
   ],

@@ -3,7 +3,7 @@
  */
 
 export interface AnimationEvent {
-  type: 'feed' | 'play' | 'rest' | 'poop' | 'pet';
+  type: 'feed' | 'play' | 'rest' | 'poop' | 'pet' | 'media';
   creatureId: string;
   userId: string;
   userName?: string;
@@ -13,6 +13,11 @@ export interface AnimationEvent {
     hunger?: number;
     love?: number;
     tiredness?: number;
+  };
+  mediaConfig?: {
+    type: 'image' | 'video';
+    src: string;
+    duration: number;
   };
 }
 
