@@ -11,6 +11,7 @@ import dogSleeping from '~/public/dogSleeping.json';
 import type { Creature } from '@/lib/database/client';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
 import type { AnimationEvent } from '@/lib/websocket';
+import { useSoundManager } from '@/lib/sound-manager';
 
 type AnimationType =
   | 'walking'
@@ -61,6 +62,7 @@ export default function CreatureAnimation({
   const scheduledTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { onAnimationSync, joinCreatureRoom, connected, triggerAnimation } =
     useWebSocket();
+  const { playSound, stopSound } = useSoundManager();
 
   const animations = useMemo<Record<AnimationType, AnimationConfig>>(
     () => ({
@@ -149,12 +151,12 @@ export default function CreatureAnimation({
         setCurrentMedia(mediaConfig || null);
         setIsTransitioning(false);
 
-        if (animationType === 'media' && mediaConfig) {
-          timeoutRef.current = setTimeout(
-            startReturnTransition,
-            mediaConfig.duration
-          );
-        } else if (config.duration) {
+        // Play sound for the animation (only if it's a supported sound type)
+        if (animationType !== 'walking' && animationType !== 'media') {
+          playSound(animationType);
+        }
+
+        if (config.duration) {
           timeoutRef.current = setTimeout(
             startReturnTransition,
             config.duration
@@ -172,6 +174,13 @@ export default function CreatureAnimation({
         setCurrentMedia(null);
         setIsPlayingTemporaryAnimation(false);
         setIsTransitioning(false);
+
+        // Stop any non-looping sounds
+        stopSound('eating');
+        stopSound('playing');
+        stopSound('pooping');
+        stopSound('petting');
+        stopSound('resting');
       };
 
       setIsTransitioning(true);
@@ -247,14 +256,14 @@ export default function CreatureAnimation({
   }
 
   return (
-    <div className='relative'>
+    <div className='relative h-full'>
       <div
-        className={`transition-opacity duration-300 ease-in-out relative ${
+        className={`transition-opacity duration-300 ease-in-out relative h-full ${
           isTransitioning ? 'opacity-0' : 'opacity-100'
         }`}
       >
         <div
-          className='absolute border-4 border-indigo-600 h-full w-full z-1 bg-transparent'
+          className='absolute border-4 border-indigo-600 h-full w-full z-1 bg-transparent bottom-0'
           onClick={handleCreatureClick}
         />
 
@@ -295,7 +304,7 @@ export default function CreatureAnimation({
           <Lottie
             animationData={animations[currentAnimation].data}
             loop={animations[currentAnimation].loop}
-            className='h-[250px] w-auto mx-auto'
+            className='w-auto mx-auto h-full'
           />
         )}
       </div>
