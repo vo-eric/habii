@@ -26,7 +26,7 @@ export default function CreatureDisplay() {
       <div
         className='w-full h-[500px] max-w-md mx-auto bg-white rounded-lg shadow-md text-black relative overflow-hidden cursor-pointer'
         style={{
-          backgroundImage: 'url(/living_room.png)',
+          backgroundImage: creature ? 'url(/living_room.png)' : 'none',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
